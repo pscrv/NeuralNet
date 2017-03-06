@@ -43,8 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Algebra\NetworkVector.cs" />
     <Compile Include="Layers\Layer.cs" />
     <Compile Include="Layers\Linear.cs" />
+    <Compile Include="Algebra\NetworkMatrix.cs" />
     <Compile Include="Layers\Sigmoid.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

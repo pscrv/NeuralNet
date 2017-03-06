@@ -67,8 +67,8 @@ namespace TestNeuralNet
         {
             double[,] weights = new double[,] { { 1, 2, 3 }, { 3, 4, 5 } };
             Layer layer = new Layer(weights);
-            Assert.AreEqual(0, layer.Output[0]);
-            Assert.AreEqual(0, layer.Output[1]);
+            Assert.AreEqual(0, layer.Output.Values[0]);
+            Assert.AreEqual(0, layer.Output.Values[1]);
         }
 
         [TestMethod]
@@ -88,7 +88,7 @@ namespace TestNeuralNet
         public void BackpropagateRequiresCorrectInputSize()
         {
             double[,] weights = new double[,] { { 1 } };
-            double[] badInput = new double[] { 1, 2, 3 };
+            NetworkVector badInput = new NetworkVector( new double[] { 1, 2, 3 } );
             Layer layer = new Layer(weights);
             try
             {
@@ -103,14 +103,14 @@ namespace TestNeuralNet
         public void BackpropagateRuns()
         {
             double[,] weights = new double[,] { { 1 } };
-            double[] outputgradient = new double[] { 1 };
+            NetworkVector outputgradient = new NetworkVector( new double[] { 1 } );
             Layer layer = new Layer(weights);
             layer.BackPropagate(outputgradient);
 
             double[] inputGradientCheck = new double[] { 1 };
             for (int i = 0; i < layer.NumberOfInputs; i++)
             {
-                Assert.AreEqual(inputGradientCheck[i], layer.InputGradient[i]);
+                Assert.AreEqual(inputGradientCheck[i], layer.InputGradient.Values[i]);
             }
         }
     }
@@ -125,7 +125,7 @@ namespace TestNeuralNet
             double[,] weights = new double[,] { { 1, 0, 1 }, { 1, 1, 0 } };
             double[] inputvector = new double[] { 1, 2, 3 };
             Layer layer = new LinearLayer(weights);
-            double[] result = layer.Run(inputvector);
+            double[] result = layer.Run(inputvector).Values;
             double[] expectedResult = new double[] { 4, 3 };
             Assert.AreEqual(expectedResult[0], result[0]);
             Assert.AreEqual(expectedResult[1], result[1]);
@@ -138,7 +138,7 @@ namespace TestNeuralNet
             double[] biases = new double[] { 4, 3 };
             double[] inputvector = new double[] { 1, 2, 3 };
             Layer layer = new LinearLayer(weights, biases);
-            double[] result = layer.Run(inputvector);
+            double[] result = layer.Run(inputvector).Values;
             double[] expectedResult = new double[] { 8, 6 };
             Assert.AreEqual(expectedResult[0], result[0]);
             Assert.AreEqual(expectedResult[1], result[1]);
@@ -157,7 +157,7 @@ namespace TestNeuralNet
             }            
 
             Layer layer = new LinearLayer(weights);
-            double[] result = layer.Run(inputvector);
+            double[] result = layer.Run(inputvector).Values;
 
             for (int i = 0, j = 1000; i < 1000; i++, j++)
             {
@@ -170,14 +170,14 @@ namespace TestNeuralNet
         public void BackpropagateRunsWithZeroLayerInput()
         {
             double[,] weights = new double[,] { { 1 } };
-            double[] outputgradient = new double[] { 1 };
+            NetworkVector outputgradient = new NetworkVector( new double[] { 1 } );
             Layer layer = new LinearLayer(weights);
             layer.BackPropagate(outputgradient);
 
             double[] inputGradientCheck = new double[] { 1 };
             for (int i  = 0; i < layer.NumberOfInputs; i++)
             {
-                Assert.AreEqual(inputGradientCheck[i], layer.InputGradient[i]);
+                Assert.AreEqual(inputGradientCheck[i], layer.InputGradient.Values[i]);
             }
         }
 
@@ -190,13 +190,13 @@ namespace TestNeuralNet
             double[] layerinput = new double[] { 2 };
             layer.Run(layerinput);
 
-            double[] outputgradient = new double[] { 1 };
+            NetworkVector outputgradient = new NetworkVector( new double[] { 1 } );
             layer.BackPropagate(outputgradient);
 
             double[] inputGradientCheck = new double[] { 1 };
             for (int i = 0; i < layer.NumberOfInputs; i++)
             {
-                Assert.AreEqual(inputGradientCheck[i], layer.InputGradient[i]);
+                Assert.AreEqual(inputGradientCheck[i], layer.InputGradient.Values[i]);
             }
         }
 
@@ -209,13 +209,49 @@ namespace TestNeuralNet
             double[] layerinput = new double[] { 1, 0, -1 };
             layer.Run(layerinput);
 
-            double[] outputgradient = new double[] { 1, 1 };
+            NetworkVector outputgradient = new NetworkVector( new double[] { 1, 1 });
             layer.BackPropagate(outputgradient);
 
             double[] inputGradientCheck = new double[] { 3, 5, 7 };
             for (int i = 0; i < layer.NumberOfInputs; i++)
             {
-                Assert.AreEqual(inputGradientCheck[i], layer.InputGradient[i], string.Format("Failure for input {0}", i));
+                Assert.AreEqual(inputGradientCheck[i], layer.InputGradient.Values[i], string.Format("Failure for input {0}", i));
+            }
+        }
+
+        [TestMethod]
+        public void BackPropagateIsCorrect()
+        {
+
+            double[,] weights = new double[,] { { 1, 2}, { 3, 5} };
+            Layer layer = new LinearLayer(weights);
+
+            double[] layerinput = new double[] { 1, -1 };
+            layer.Run(layerinput);
+
+            NetworkVector outputgradient = new NetworkVector( new double[] { 7, 11 } );
+            layer.BackPropagate(outputgradient);
+
+            double[,] weightsCheck = new double[,] { { -6, 9 }, { -8, 16 } };
+            LayerState state = layer.State;
+            for (int i = 0; i < layer.NumberOfNeurons; i++)
+            {
+                for (int j = 0; j < layer.NumberOfInputs; j++)
+                {
+                    Assert.AreEqual(weightsCheck[i, j], state.Weights[i, j], string.Format("Failed for (i, j) = ({0}, {1}", i, j));
+                }
+            }
+
+            double[] biasesCheck = new double[] { -7, -11 };
+            for (int i = 0; i < layer.NumberOfNeurons; i++)
+            {
+                Assert.AreEqual(biasesCheck[i], layer.State.Biases[i]);
+            }
+
+            double[] inputGradientCheck = new double[] { 40, 69 };
+            for (int i = 0; i < layer.NumberOfInputs; i++)
+            {
+                Assert.AreEqual(inputGradientCheck[i], layer.InputGradient.Values[i], string.Format("Failure for input {0}", i));
             }
         }
 
@@ -247,7 +283,7 @@ namespace TestNeuralNet
             double[,] weights = new double[,] { { 1, 0, 1 }, { 1, 1, 0 } };
             double[] inputvector = new double[] { 1, 2, 3 };
             Layer layer = new SigmoidLayer(weights);
-            double[] result = layer.Run(inputvector);
+            double[] result = layer.Run(inputvector).Values;
             double[] expectedResult = new double[] { sigmoid(4), sigmoid(3) };
             Assert.AreEqual(expectedResult[0], result[0]);
             Assert.AreEqual(expectedResult[1], result[1]);
@@ -260,7 +296,7 @@ namespace TestNeuralNet
             double[] biases = new double[] { 4, 3 };
             double[] inputvector = new double[] { 1, 2, 3 };
             Layer layer = new SigmoidLayer(weights, biases);
-            double[] result = layer.Run(inputvector);
+            double[] result = layer.Run(inputvector).Values;
             double[] expectedResult = new double[] { sigmoid(8), sigmoid(6) };
             Assert.AreEqual(expectedResult[0], result[0]);
             Assert.AreEqual(expectedResult[1], result[1]);
@@ -279,7 +315,7 @@ namespace TestNeuralNet
             }
 
             Layer layer = new SigmoidLayer(weights);
-            double[] result = layer.Run(inputvector);
+            double[] result = layer.Run(inputvector).Values;
 
             double sig0 = sigmoid(0.0);
             for (int i = 0, j = 1000; i < 1000; i++, j++)
@@ -293,14 +329,14 @@ namespace TestNeuralNet
         public void BackpropagateRuns()
         {
             double[,] weights = new double[,] { { 1 } };
-            double[] outputgradient = new double[] { 1 };
+            NetworkVector outputgradient = new NetworkVector( new double[] { 1 } );
             Layer layer = new SigmoidLayer(weights);
             layer.BackPropagate(outputgradient);
 
             double[] inputGradientCheck = new double[] { 0 };
             for (int i = 0; i < layer.NumberOfInputs; i++)
             {
-                Assert.AreEqual(inputGradientCheck[i], layer.InputGradient[i]);
+                Assert.AreEqual(inputGradientCheck[i], layer.InputGradient.Values[i]);
             }
         }
         [TestMethod]
@@ -312,13 +348,13 @@ namespace TestNeuralNet
             double[] layerinput = new double[] { 1, 0, -1 };
             layer.Run(layerinput);
 
-            double[] outputgradient = new double[] { 1, 1 };
+            NetworkVector outputgradient = new NetworkVector( new double[] { 1, 1 } );
             layer.BackPropagate(outputgradient);
 
             double[] inputGradientCheck = new double[] { 0.31498075621051952, 0.52496792701753248, 0.7349550978245456 };
             for (int i = 0; i < layer.NumberOfInputs; i++)
             {
-                Assert.AreEqual(inputGradientCheck[i], layer.InputGradient[i], string.Format("Failure for input {0}", i));
+                Assert.AreEqual(inputGradientCheck[i], layer.InputGradient.Values[i], string.Format("Failure for input {0}", i));
             }
         }
     }

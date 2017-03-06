@@ -2,47 +2,81 @@
 
 namespace NeuralNet
 {
+    public class LayerState
+    {
+        public double[,] Weights { get; private set; }
+        public double[] Biases { get; private set; }
+
+        public LayerState(NetworkMatrix weights, NetworkVector biases)
+        {
+            int numberOfNeurons = weights.NumberOfNeurons;
+            int numberOfInputs = weights.NumberOfInputs;
+
+            if (biases.Dimension != numberOfNeurons)
+                throw new ArgumentException("Invalid layer state: weights and biases do not agree on the number of neurons.");
+
+            Weights = new double[numberOfNeurons, numberOfInputs];
+            Biases = new double[numberOfNeurons];
+
+            for (int i = 0; i < numberOfNeurons; i++)
+            {
+                Biases[i] = biases.Values[i];
+
+                for (int j = 0; j < numberOfInputs; j++)
+                {
+                    Weights[i, j] = weights.Values[i, j];
+                }
+            }
+        }
+    }
+
 
     public class Layer
     {
+        #region delegates
         public delegate double ActivationFunction(double summedInput);
         public delegate double DerivativeFunction(double input, double output);
+        #endregion
 
-        protected double[] _inputs;
-        protected double[,] _weights;
-        protected double[] _biases;
-        protected double[] _activations;
-        protected double[] _outputs;
+        #region private attributes
+        NetworkVector _inputs;
+        NetworkMatrix _weights;
+        NetworkVector _biases;
+        NetworkVector _activations;
+        NetworkVector _outputs;
+        NetworkVector _inputGradient;
         protected ActivationFunction _neuralFunction;
         protected DerivativeFunction _neuralFunctionDerivative;
-        protected double[] _inputGradient;
+        #endregion
 
-        public int NumberOfNeurons { get { return _weights.GetLength(0); } }
-        public int NumberOfInputs { get { return _weights.GetLength(1); } }
-        public double[,] Weights { get { return _weights; } }
-        public double[] InputGradient { get { return _inputGradient; } }
-        public double[] Output { get { return _outputs; } }
-
+        #region public properties
+        public int NumberOfNeurons { get { return _weights.NumberOfNeurons; } }
+        public int NumberOfInputs { get { return _weights.NumberOfInputs; } }
+        public NetworkVector InputGradient { get { return _inputGradient; } }
+        public NetworkVector Output { get { return _outputs; } }
+        public LayerState State { get { return new LayerState(_weights, _biases); } }
+        #endregion
 
         #region Constructors
         public Layer(double[,] weights, double[] biases = null)
         {
             _neuralFunction = null;
-            _weights = weights;
-            _inputs = new double[NumberOfInputs];
-            _activations = new double[NumberOfNeurons];
-            _outputs = new double[NumberOfNeurons];
-            _inputGradient = new double[NumberOfInputs];
+            _weights = new NetworkMatrix(weights);
+
+            _inputs = new NetworkVector(NumberOfInputs);
+            _activations = new NetworkVector(NumberOfNeurons);
+            _outputs = new NetworkVector(NumberOfNeurons);
+            _inputGradient = new NetworkVector(NumberOfInputs);
 
             if (biases != null)
             {
                 if (biases.Length != NumberOfNeurons)
                     throw new ArgumentException("Length of biases must the the same as the number of neurons.");
-                _biases = biases;
+                _biases = new NetworkVector(biases);
             }
             else
             {
-                _biases = new double[NumberOfNeurons];
+                _biases = new NetworkVector(NumberOfNeurons);
             }
         }
 
@@ -58,121 +92,86 @@ namespace NeuralNet
         #endregion
 
         #region public methods
-        public double[] Run(double[] inputvalues)
+        public NetworkVector Run(double[] inputvalues)
         {
-            _inputs = inputvalues;
-            double[] sum = _multiplyByWeights(inputvalues);
-            _activations = _addBiasesTo(sum);
+            _inputs.SetValues(inputvalues);
+            NetworkVector sum = _weights.LeftMultiply(_inputs);
+            _activations = _biases.SumWith(sum);
             if (_neuralFunction != null)
             {
-                for (int i = 0; i < _activations.Length; i++)
-                {
-                    _outputs[i] = _neuralFunction(_activations[i]);
-                }
+                _outputs = NetworkVector.ApplyFunctionComponentWise(_activations, x => _neuralFunction(x));
             }
             else
             {
-                _outputs = _activations;
+                _outputs = _activations.Copy();
             }
             return _outputs;
         }
 
-        public void BackPropagate(double[] outputgradient)
+        public void BackPropagate(NetworkVector outputgradient)
         {
-            if (outputgradient == null || outputgradient.Length != NumberOfNeurons)
+            if (outputgradient == null || outputgradient.Dimension != NumberOfNeurons)
                 throw new ArgumentException("outputgradient may not be null and must have dimension equal to NumberOfNeurons.");
 
-            double[] activationGradient;
-            double[,] weightsGradient;
+            NetworkVector activationGradient;
+            NetworkMatrix weightsGradient;
+            NetworkVector biasesGradient;
 
             activationGradient = _getActivationGradient(outputgradient);
-            _setInputGradient(activationGradient);
             weightsGradient = _getWeightsGradient(activationGradient);
-            _addToWeights(weightsGradient);
+            biasesGradient = _getBiasessGradient(activationGradient);
+
+            _setInputGradient(activationGradient);
+            _subtractFromWeights(weightsGradient);
+            _subtractFromBiases(biasesGradient);
         }
 
         #endregion
 
-        #region private methods for back propagations
-        private double[] _getActivationGradient(double[] outputgradient)
-        {
-            double[] activationGradient = new double[NumberOfNeurons];
-            for (int i = 0; i < NumberOfNeurons; i++)
-            {
-                activationGradient[i] = outputgradient[i];
-                if (_neuralFunctionDerivative != null)
-                    activationGradient[i] *= _neuralFunctionDerivative(_activations[i], _outputs[i]);
-            }
-            return activationGradient;
-        }
 
-        private double[,] _getWeightsGradient(double[] activationGradient)
-        {
-            double[,] weightsGradient = new double[NumberOfNeurons, NumberOfInputs];
-            for (int i = 0; i < NumberOfNeurons; i++)
-            {
-                for (int j = 0; j < NumberOfInputs; j++)
-                {
-                    weightsGradient[i, j] = _inputs[j] * activationGradient[i];
-                }
-            }
-            return weightsGradient;
-        }
-
-        private void _setInputGradient(double[] activationGradient)
-        {
-            for (int i = 0; i < NumberOfInputs; i++)
-            {
-                _inputGradient[i] = 0.0;
-                for (int j = 0; j < NumberOfNeurons; j++)
-                {
-                    _inputGradient[i] += _weights[j, i] * activationGradient[j];
-                }
-            }
-        }
-        #endregion
 
 
         #region private methods for forward run
-        private double[] _multiplyByWeights(double[] vector)
-        {
-            int numberOfNeurons = NumberOfNeurons;
-            double sum;
-            double[] result = new double[numberOfNeurons];
-            for (int i = 0; i < numberOfNeurons; i++)
-            {
-                sum = 0;
-                for (int j= 0; j < vector.Length; j++)
-                {
-                    sum += _weights[i, j] * vector[j];
-                }
-                result[i] = sum;
-            }
+        #endregion
 
-            return result;
+
+
+
+        #region private methods for back propagations
+        private NetworkVector _getActivationGradient(NetworkVector outputgradient)
+        {
+            NetworkVector activationGradient = new NetworkVector(NumberOfNeurons);
+            activationGradient = outputgradient.Copy();
+            if (_neuralFunctionDerivative != null)
+                activationGradient = NetworkVector.ApplyFunctionComponentWise(_activations, _outputs, (x, y) => _neuralFunctionDerivative(x, y));
+            return activationGradient;
         }
 
-        private double[] _addBiasesTo(double[] vectorToAdd)
+        private NetworkMatrix _getWeightsGradient(NetworkVector activationGradient)
         {
-            double[] result = new double[NumberOfNeurons];
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = vectorToAdd[i] + _biases[i];
-            }
-
-            return result;
+            return _inputs.LeftMultiply(activationGradient);
         }
 
-        private void _addToWeights(double[,] matrixToAdd)
+        private NetworkVector _getBiasessGradient(NetworkVector activationGradient)
         {
-            for (int i = 0; i < NumberOfNeurons; i++)
-            {
-                for (int j = 0; j < NumberOfInputs; j++)
-                {
-                    _weights[i, j] += matrixToAdd[i, j];
-                }
-            }
+            return activationGradient.Copy();
+        }
+
+        private void _setInputGradient(NetworkVector activationGradient)
+        {
+            _inputGradient = _weights.NeuronWiseWeightAndSum(activationGradient);
+        }
+
+        private void _subtractFromWeights(NetworkMatrix matrixToSubtract)
+        {
+            _weights.Subtract(matrixToSubtract);
+        }
+
+        private void _subtractFromBiases(NetworkVector vectorToSubtract)
+        {
+            _biases.Subtract(vectorToSubtract);
         }
         #endregion
+
     }
 }
