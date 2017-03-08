@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NeuralNet
 {
-    public class NetworkVector
+    public class NetworkVector : IEquatable<NetworkVector>
     {
         #region delegates
         public delegate double SingleVariableFunction(double input);
@@ -19,14 +19,6 @@ namespace NeuralNet
 
         #region public properties
         public int Dimension { get { return _vector.Length; } }
-
-        // next line will not be needed, as methods are moved to this class
-        // but perhaps needed as _matrix.clone()?
-        public double[] Values
-        {
-            get { return (double[])_vector; }
-            set { _vector = value; }
-        }
         #endregion
 
         #region constructors
@@ -75,6 +67,7 @@ namespace NeuralNet
 
 
         #region public methods
+        // is this still needed?
         public void SetValues(double[] values)
         {
             _vector = (double[]) values.Clone();
@@ -105,14 +98,26 @@ namespace NeuralNet
             }
         }
 
+        public double DotProduct(NetworkVector other)
+        {
+            if (this.Dimension != other.Dimension)
+                throw new ArgumentNullException("Attempt to form dot product, but dimensions do not match.");
+            double sum = 0.0;
+            for (int i = 0; i < Dimension; i++)
+            {
+                sum += this._vector[i] * other._vector[i];
+            }
+            return sum;
+        }
+
         public NetworkMatrix LeftMultiply(NetworkVector other)
         {
-            double[,] result = new double[other.Dimension, this.Dimension];
-            for (int i = 0; i < other.Dimension; i++)
+            double[,] result = new double[this.Dimension, other.Dimension];
+            for (int i = 0; i < this.Dimension; i++)
             {
-                for (int j = 0; j < this.Dimension; j++)
+                for (int j = 0; j < other.Dimension; j++)
                 {
-                    result[i, j] = this._vector[j] * other._vector[i];
+                    result[i, j] = this._vector[i] * other._vector[j];
                 }
             }
             return new NetworkMatrix(result);
@@ -121,6 +126,61 @@ namespace NeuralNet
         public NetworkVector Copy()
         {
             return new NetworkVector(this._vector);
+        }
+
+        public double[] ToArray()
+        {
+            return (double[]) _vector.Clone();
+        }
+        #endregion
+
+
+        #region overrides (comparison)
+        public override bool Equals(object other)
+        {
+            if (ReferenceEquals(null, other))
+                return false;
+
+            if (ReferenceEquals(other, this))
+                return true;
+
+            if (other.GetType() != this.GetType())
+                return false;
+
+            return this.Equals(other as NetworkVector);
+        }
+
+        public bool Equals(NetworkVector other)
+        {
+            if (other == null)
+                return false;
+
+            if (this.Dimension != other.Dimension)
+                return false;
+
+            double epsilon = 0.000000001;
+            for (int i = 0; i < this.Dimension; i++)
+            {
+                double difference = Math.Abs(this._vector[i] - other._vector[i]);
+                if (difference >= epsilon)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 11;
+            unchecked
+            {
+                for (int i = 0; i < Dimension; i++)
+                {
+                    hash <<= 1;
+                    hash ^= _vector[i].GetHashCode();
+                }
+            }
+            return hash;
         }
         #endregion
     }
