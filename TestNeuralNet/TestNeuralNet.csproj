@@ -53,10 +53,14 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AlgebraTests.cs" />
+    <Compile Include="ComponentChainTests.cs" />
+    <Compile Include="LayerBankTests.cs" />
     <Compile Include="LayerTests.cs" />
     <Compile Include="NetworkTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LayerChainTests.cs" />
+    <Compile Include="SoftMaxTests.cs" />
+    <Compile Include="WeightedCombinerBankTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NeuralNet\NeuralNet.csproj">

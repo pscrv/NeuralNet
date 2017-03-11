@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using NeuralNet;
+using System.Collections.Generic;
 
 namespace TestNeuralNet
 {
@@ -78,19 +79,7 @@ namespace TestNeuralNet
             Assert.AreEqual(0.0, vectorValues[0]);
             Assert.AreEqual(1.0, vectorValues[1]);
         }
-
-        [TestMethod]
-        public void CanSetValues()
-        {
-            NetworkVector vector = new NetworkVector(5);
-            double[] array = new double[] { 1, 2, 3, 4, 5 };
-            vector.SetValues(array);
-            double[] vectorValues = vector.ToArray();
-            for (int i = 0; i < array.Length; i++)
-            {
-                Assert.AreEqual(array[i], vectorValues[i]);
-            }
-        }
+        
 
         [TestMethod]
         public void CanSubtract()
@@ -103,6 +92,27 @@ namespace TestNeuralNet
                 Assert.AreEqual(0.0, vectorValues[i]);
             }
         }
+
+        [TestMethod]
+        public void CanSum()
+        {
+            int listSize = 1000000;
+            NetworkVector vector = new NetworkVector(new double[] { 0, 1, 2, 3, 4, 5 });
+            List<NetworkVector> list = new List<NetworkVector>();
+
+            for (int i = 0; i < listSize; i++)
+            {
+                list.Add(vector);
+            }
+
+            vector = NetworkVector.Sum(list);
+            double[] result = vector.ToArray();
+            for (int i = 0; i < vector.Dimension; i++)
+            {
+                Assert.AreEqual(i * listSize, result[i]);
+            }
+        }
+
 
         [TestMethod]
         public void CanMakeDotProduct()
@@ -151,7 +161,7 @@ namespace TestNeuralNet
             NetworkMatrix matrix = new NetworkMatrix(neuronCount, inputcount);
 
             double[,] matrixValues = matrix.ToArray();
-            Assert.AreEqual(neuronCount, matrix.NumberOfNeurons);
+            Assert.AreEqual(neuronCount, matrix.NumberOfOutputs);
             Assert.AreEqual(inputcount, matrix.NumberOfInputs);
             for (int i = 0; i < neuronCount; i++)
                 for (int j = 0; j < inputcount; j++)
@@ -166,7 +176,7 @@ namespace TestNeuralNet
             NetworkMatrix matrix = new NetworkMatrix(new double[,]{ {0, 1, 2 }, { 1, 2, 3} });
 
             double[,] matrixValues = matrix.ToArray();
-            Assert.AreEqual(neuronCount, matrix.NumberOfNeurons);
+            Assert.AreEqual(neuronCount, matrix.NumberOfOutputs);
             Assert.AreEqual(inputcount, matrix.NumberOfInputs);
             for (int i = 0; i < neuronCount; i++)
                 for (int j = 0; j < inputcount; j++)
@@ -210,6 +220,8 @@ namespace TestNeuralNet
             Assert.AreEqual(0, resultValues[0]);
             Assert.AreEqual(1, resultValues[1]);
         }
+
+        //TODO: write tests for equality and hash
 
     }
 }

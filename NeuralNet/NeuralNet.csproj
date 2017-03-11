@@ -44,13 +44,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algebra\NetworkVector.cs" />
+    <Compile Include="NetworkComponents\Delegates.cs" />
+    <Compile Include="NetworkComponents\LayerBank.cs" />
+    <Compile Include="NetworkComponents\Layer\Elements\NeuralFunction.cs" />
+    <Compile Include="NetworkComponents\Layer\LayerBase.cs" />
     <Compile Include="NetworkComponents\Layer\LayerState.cs" />
-    <Compile Include="NetworkComponents\Layer\Layer.cs" />
+    <Compile Include="NetworkComponents\Layer\Elements\WeightedCombiner.cs" />
     <Compile Include="NetworkComponents\Layer\LayerChain.cs" />
     <Compile Include="NetworkComponents\Layer\Linear.cs" />
     <Compile Include="Algebra\NetworkMatrix.cs" />
     <Compile Include="NetworkComponents\Layer\Sigmoid.cs" />
-    <Compile Include="NetworkComponents\Layer\LayerComponent.cs" />
+    <Compile Include="NetworkComponents\NetworkComponent.cs" />
+    <Compile Include="NetworkComponents\SpecialComponents\SoftMaxUnit.cs" />
+    <Compile Include="NetworkComponents\NetworkComponentChain.cs" />
     <Compile Include="Networks\SimpleNetwork.cs" />
     <Compile Include="Networks\TwoLayerTestNetwork.cs" />
     <Compile Include="Program.cs" />

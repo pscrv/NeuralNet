@@ -30,12 +30,12 @@ namespace TestNeuralNet
             Layer layer = new Layer(new double[,] { { 1 } });
 
             LayerChain layerlist = new LayerChain();
-            Assert.AreEqual(0, layerlist.NumberOfLayers);
+            Assert.AreEqual(0, layerlist.NumberOfComponents);
 
             for (int i = 1; i < 10; i++)
             {
                 layerlist.Add(layer);
-                Assert.AreEqual(i, layerlist.NumberOfLayers);
+                Assert.AreEqual(i, layerlist.NumberOfComponents);
             }
         }
 
@@ -163,6 +163,28 @@ namespace TestNeuralNet
             }
 
         }
+
+
+        [TestMethod]
+        public void CannotAddNonLayer()
+        {
+            Layer layer = new Layer(new double[,] { { 1 } });
+            NetworkComponent layer_component = new Layer(new double[,] { { 2 } });
+            NetworkComponent non_layer_component = new SoftMaxUnit(1);
+
+            LayerChain lChain = new LayerChain();
+            lChain.Add(layer);
+            lChain.Add(layer_component);
+
+            try
+            {
+                lChain.Add(non_layer_component);
+                Assert.Fail("Attempt to add a network component that cannot be cast as Layer failed to throw an ArgumentException.");
+            }
+            catch (ArgumentException) { }
+
+        }
+
 
     }
 }

@@ -21,5 +21,5 @@ namespace NeuralNet
         public SigmoidLayer(double[,] weights, double[] biases = null)
             : base(weights:weights, biases:biases, activationfunction:sigmoid, derivativefunction:sigmoidDerivative)
         { }
-    }
+    }    
 }

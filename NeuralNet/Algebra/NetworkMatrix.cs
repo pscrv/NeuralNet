@@ -13,7 +13,7 @@ namespace NeuralNet
         #endregion
 
         #region public properties
-        public int NumberOfNeurons { get { return _matrix.GetLength(0); } }
+        public int NumberOfOutputs { get { return _matrix.GetLength(0); } }
         public int NumberOfInputs { get { return _matrix.GetLength(1); } }        
         #endregion
 
@@ -34,7 +34,7 @@ namespace NeuralNet
         #region public methods
         public void Subtract(NetworkMatrix other)
         {
-            for (int i = 0; i < NumberOfNeurons; i++)
+            for (int i = 0; i < NumberOfOutputs; i++)
             {
                 for (int j = 0; j < NumberOfInputs; j++)
                 {
@@ -47,8 +47,8 @@ namespace NeuralNet
         {
             double[] vectorarray = vector.ToArray();
             double sum;
-            double[] result = new double[NumberOfNeurons];
-            for (int i = 0; i < NumberOfNeurons; i++)
+            double[] result = new double[NumberOfOutputs];
+            for (int i = 0; i < NumberOfOutputs; i++)
             {
                 sum = 0;
                 for (int j = 0; j < vector.Dimension; j++)
@@ -74,6 +74,11 @@ namespace NeuralNet
             return new NetworkVector(result);
         }
 
+        public NetworkMatrix Copy()
+        {
+            return new NetworkMatrix(_matrix.Clone() as double[,]);
+        }
+
         public double[,] ToArray()
         {
             return (double[,]) _matrix.Clone();
@@ -83,12 +88,64 @@ namespace NeuralNet
         #region private methods
         private NetworkVector _getWeightsForOneInput(int inputindex)
         {
-            double[] result = new double[NumberOfNeurons];
-            for (int i = 0; i < NumberOfNeurons; i++)
+            double[] result = new double[NumberOfOutputs];
+            for (int i = 0; i < NumberOfOutputs; i++)
             {
                 result[i] = _matrix[i, inputindex];
             }
             return new NetworkVector(result);
+        }
+        #endregion
+
+
+        #region overrides (comparison)
+        public override bool Equals(object other)
+        {
+            if (ReferenceEquals(null, other))
+                return false;
+
+            if (ReferenceEquals(other, this))
+                return true;
+
+            if (other.GetType() != this.GetType())
+                return false;
+
+            return this.Equals(other as NetworkMatrix);
+        }
+
+        public bool Equals(NetworkMatrix other)
+        {
+            if (other == null)
+                return false;
+
+            if (this.NumberOfInputs != other.NumberOfInputs || this.NumberOfOutputs != other.NumberOfOutputs)
+                return false;
+
+            double epsilon = 0.000000001;
+            for (int i = 0; i < this.NumberOfOutputs; i++)
+                for (int j = 0; j < NumberOfInputs; j++)
+                {
+                    double difference = Math.Abs(this._matrix[i, j] - other._matrix[i, j]);
+                    if (difference >= epsilon)
+                        return false;
+                }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 11;
+            unchecked
+            {
+                for (int i = 0; i < NumberOfOutputs; i++)
+                    for (int j = 0; j < NumberOfInputs; j++)
+                    {
+                        hash <<= 1;
+                        hash ^= _matrix[i, j].GetHashCode();
+                    }
+            }
+            return hash;
         }
         #endregion
     }

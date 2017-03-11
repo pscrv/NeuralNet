@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NeuralNet
 {
-    public abstract class LayerComponent
+    public abstract class NetworkComponent
     {
         public abstract int NumberOfInputs { get; }
         public abstract int NumberOfOutputs { get; }

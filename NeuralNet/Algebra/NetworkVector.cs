@@ -36,6 +36,22 @@ namespace NeuralNet
 
 
         #region static methods
+        public static NetworkVector Sum(IEnumerable<NetworkVector> vectors)
+        {
+            int dimension = vectors.ElementAt(0).Dimension;
+            if (vectors.Any(x => x.Dimension != dimension))
+                throw new ArgumentException("Attempt do add vectors of different sizes.");
+            double[] result = new double[dimension];
+            foreach (NetworkVector vector in vectors)
+            {
+                for (int i = 0; i < dimension; i++)
+                {
+                    result[i] += vector._vector[i];
+                }
+            }
+            return new NetworkVector(result);
+        }
+
         public static NetworkVector ApplyFunctionComponentWise(NetworkVector vector, SingleVariableFunction fctn)
         {
             int dimension = vector.Dimension;
@@ -63,20 +79,42 @@ namespace NeuralNet
 
             return new NetworkVector(result);
         }
+
+        public static NetworkVector Concatenate(IEnumerable<NetworkVector> vectorsToConcatenate)
+        {
+            if (vectorsToConcatenate == null || vectorsToConcatenate.Count() == 0)
+                throw new ArgumentException("Attempt to concatenate null or empty IEnumerable<NetworkVector.");
+            
+            int totalDimension = vectorsToConcatenate.Sum(x => x.Dimension);
+
+            double[] resultVector = new double[totalDimension];
+            int index = 0;
+            foreach (NetworkVector vector in vectorsToConcatenate)
+            {
+                Array.Copy(vector._vector, 0, resultVector, index, vector.Dimension);
+                index += vector.Dimension;
+            }
+            return new NetworkVector(resultVector);
+        }
         #endregion
 
 
         #region public methods
-        // is this still needed?
-        public void SetValues(double[] values)
+        public double SumValues()
         {
-            _vector = (double[]) values.Clone();
+            double sum = 0.0;
+            for (int i = 0; i < Dimension; i++)
+            {
+                sum += _vector[i];
+            }
+
+            return sum;
         }
 
         public NetworkVector SumWith(NetworkVector other)
         {
             if (this.Dimension != other.Dimension)
-                throw new ArgumentException("Cannot add vectors of different dimention.");
+                throw new ArgumentException("Cannot add vectors of different dimension.");
 
             double[] result = new double[Dimension];
             for (int i = 0; i < Dimension; i++)
@@ -123,9 +161,33 @@ namespace NeuralNet
             return new NetworkMatrix(result);
         }
 
+        public List<NetworkVector> Segment(int partCount)
+        {
+            if (partCount <= 0)
+                throw new ArgumentException("Attempt to segment into fewer than one part.");
+
+            if (Dimension % partCount != 0)  // drop this and rely on the caller, for speed?
+                throw new ArgumentException("Attempt to segment a NetworkVector into unequal parts.");
+
+            if (partCount == 1)
+                return new List<NetworkVector> { this };
+
+            int partDimension = Dimension / partCount;
+            double[] part = new double[partDimension];
+            List<NetworkVector> result = new List<NetworkVector>();
+
+            for (int i = 0; i < partCount; i++)
+            {
+                Array.Copy(_vector, i * partDimension, part, 0, partDimension);
+                result.Add(new NetworkVector(part));
+            }
+            return result;
+        }
+
+
         public NetworkVector Copy()
         {
-            return new NetworkVector(this._vector);
+            return new NetworkVector(this._vector.Clone() as double[]);
         }
 
         public double[] ToArray()
