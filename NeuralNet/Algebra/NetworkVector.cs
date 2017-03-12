@@ -245,5 +245,20 @@ namespace NeuralNet
             return hash;
         }
         #endregion
+
+        #region overrides
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append ("[");
+            for (int i = 0; i < Dimension- 1; i++)
+            {
+                sb.Append(_vector[i].ToString());
+                sb.Append(",");
+            }
+            sb.Append(_vector[Dimension].ToString());
+            return sb.ToString();
+        }
+        #endregion
     }
 }
