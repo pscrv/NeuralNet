@@ -100,29 +100,12 @@ namespace NeuralNet
 
 
         #region public methods
-        public double SumValues()
+        public void Zero()
         {
-            double sum = 0.0;
             for (int i = 0; i < Dimension; i++)
             {
-                sum += _vector[i];
+                _vector[i] = 0.0;
             }
-
-            return sum;
-        }
-
-        public NetworkVector SumWith(NetworkVector other)
-        {
-            if (this.Dimension != other.Dimension)
-                throw new ArgumentException("Cannot add vectors of different dimension.");
-
-            double[] result = new double[Dimension];
-            for (int i = 0; i < Dimension; i++)
-            {
-                result[i] = other._vector[i] + this._vector[i];
-            }
-
-            return new NetworkVector(result);
         }
 
         public void Subtract(NetworkVector other)
@@ -136,16 +119,36 @@ namespace NeuralNet
             }
         }
 
-        public double DotProduct(NetworkVector other)
+        public void Add(NetworkVector other)
         {
-            if (this.Dimension != other.Dimension)
-                throw new ArgumentNullException("Attempt to form dot product, but dimensions do not match.");
-            double sum = 0.0;
+            if (other.Dimension != this.Dimension)
+                throw new ArgumentException(string.Format("Attempt to subtract a vector of dimension {0} from a vector of dimsionsion {1}", other.Dimension, this.Dimension));
+
             for (int i = 0; i < Dimension; i++)
             {
-                sum += this._vector[i] * other._vector[i];
+                this._vector[i] += other._vector[i];
             }
-            return sum;
+        }
+
+        public void MultiplyBy(double factor)
+        {
+            for (int i = 0; i < Dimension; i++)
+                _vector[i] *= factor;
+        }
+
+
+        public NetworkVector SumWith(NetworkVector other)
+        {
+            if (this.Dimension != other.Dimension)
+                throw new ArgumentException("Cannot add vectors of different dimension.");
+
+            double[] result = new double[Dimension];
+            for (int i = 0; i < Dimension; i++)
+            {
+                result[i] = other._vector[i] + this._vector[i];
+            }
+
+            return new NetworkVector(result);
         }
 
         public NetworkMatrix LeftMultiply(NetworkVector other)
@@ -184,11 +187,35 @@ namespace NeuralNet
             return result;
         }
 
-
         public NetworkVector Copy()
         {
             return new NetworkVector(this._vector.Clone() as double[]);
         }
+
+
+        public double SumValues()
+        {
+            double sum = 0.0;
+            for (int i = 0; i < Dimension; i++)
+            {
+                sum += _vector[i];
+            }
+
+            return sum;
+        }
+
+        public double DotProduct(NetworkVector other)
+        {
+            if (this.Dimension != other.Dimension)
+                throw new ArgumentNullException("Attempt to form dot product, but dimensions do not match.");
+            double sum = 0.0;
+            for (int i = 0; i < Dimension; i++)
+            {
+                sum += this._vector[i] * other._vector[i];
+            }
+            return sum;
+        }
+        
 
         public double[] ToArray()
         {
@@ -251,12 +278,13 @@ namespace NeuralNet
         {
             StringBuilder sb = new StringBuilder();
             sb.Append ("[");
-            for (int i = 0; i < Dimension- 1; i++)
+            for (int i = 0; i < Dimension - 1; i++)
             {
                 sb.Append(_vector[i].ToString());
                 sb.Append(",");
             }
-            sb.Append(_vector[Dimension].ToString());
+            sb.Append(_vector[Dimension - 1].ToString());
+            sb.Append("]");
             return sb.ToString();
         }
         #endregion

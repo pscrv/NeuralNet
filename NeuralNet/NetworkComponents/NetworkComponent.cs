@@ -17,4 +17,22 @@ namespace NeuralNet
         public abstract void Run(NetworkVector input);
         public abstract void BackPropagate(NetworkVector outputgradient);
     }
+
+
+    public abstract class TrainableNetworkComponent : NetworkComponent
+    {
+        public enum TrainingMode {ONLINE, BATCH}
+
+        public TrainingMode Mode { get; protected set; }
+
+        protected TrainableNetworkComponent()
+        {
+            Mode = TrainingMode.ONLINE;
+        }
+
+        public TrainableNetworkComponent(TrainingMode mode)
+        {
+            Mode = mode;
+        }
+    }
 }

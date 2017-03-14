@@ -18,8 +18,12 @@ namespace NeuralNet
             return output * (1 - output);
         }
 
-        public SigmoidLayer(double[,] weights, double[] biases = null)
+        public SigmoidLayer(double[,] weights, double[] biases)
             : base(weights:weights, biases:biases, activationfunction:sigmoid, derivativefunction:sigmoidDerivative)
+        { }
+
+        public SigmoidLayer(double[,] weights)
+            : base(weights: weights, biases: new double[weights.GetLength(0)], activationfunction: sigmoid, derivativefunction: sigmoidDerivative)
         { }
     }    
 }

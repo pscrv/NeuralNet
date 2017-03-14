@@ -32,6 +32,24 @@ namespace NeuralNet
 
 
         #region public methods
+        public void MultiplyBy(double factor)
+        {
+            for (int i = 0; i < NumberOfOutputs; i++)
+                for (int j = 0; j < NumberOfInputs; j++)
+                    _matrix[i, j] *= factor;
+        }
+
+        public void Add(NetworkMatrix other)
+        {
+            for (int i = 0; i < NumberOfOutputs; i++)
+            {
+                for (int j = 0; j < NumberOfInputs; j++)
+                {
+                    this._matrix[i, j] += other._matrix[i, j];
+                }
+            }
+        }
+
         public void Subtract(NetworkMatrix other)
         {
             for (int i = 0; i < NumberOfOutputs; i++)
@@ -41,6 +59,13 @@ namespace NeuralNet
                     this._matrix[i, j] -= other._matrix[i, j];
                 }
             }
+        }
+
+        public void Zero()
+        {
+            for (int i = 0; i < NumberOfOutputs; i++)
+                for (int j = 0; j < NumberOfInputs; j++)
+                    _matrix[i, j] = 0.0;
         }
         
         public NetworkVector LeftMultiply(NetworkVector vector)
@@ -146,6 +171,25 @@ namespace NeuralNet
                     }
             }
             return hash;
+        }
+        #endregion
+
+        #region overrides
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < NumberOfOutputs; i++)
+            {
+                sb.Append("[");
+                for (int j = 0; j < NumberOfInputs - 1; j++)
+                {
+                    sb.Append(_matrix[i, j].ToString());
+                    sb.Append(",");
+                }
+                sb.Append(_matrix[i, NumberOfInputs - 1]);
+                sb.Append("]");
+            }
+            return sb.ToString();
         }
         #endregion
     }

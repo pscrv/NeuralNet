@@ -54,14 +54,19 @@
   <ItemGroup>
     <Compile Include="AlgebraTests.cs" />
     <Compile Include="ComponentChainTests.cs" />
+    <Compile Include="GradientDescentTests.cs" />
     <Compile Include="LayerBankTests.cs" />
     <Compile Include="LayerTests.cs" />
     <Compile Include="NetworkTests.cs" />
+    <Compile Include="NeuralFunctionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LayerChainTests.cs" />
     <Compile Include="SoftMaxTests.cs" />
+    <Compile Include="WCTrainerTests.cs" />
     <Compile Include="TrainerTests.cs" />
+    <Compile Include="WeightedCombiner2Tests.cs" />
     <Compile Include="WeightedCombinerBankTests.cs" />
+    <Compile Include="WeightedCombinerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NeuralNet\NeuralNet.csproj">

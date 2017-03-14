@@ -11,5 +11,9 @@ namespace NeuralNet
         public LinearLayer(double[,] weights, double[] biases = null)
             : base(weights, biases)
         { }
+
+        public LinearLayer(double[,] weights)
+            : base(weights, new double[weights.GetLength(0)])
+        { }
     }
 }

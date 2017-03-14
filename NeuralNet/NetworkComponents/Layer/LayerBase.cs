@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace NeuralNet
 {
-    public class Layer : NetworkComponent
+    public class Layer : TrainableNetworkComponent
     {
         #region protectred attributes
         protected WeightedCombiner _combiner;
@@ -29,7 +29,8 @@ namespace NeuralNet
 
 
         #region constructors
-        public Layer (double[,] weights, double[] biases = null)
+        public Layer(double[,] weights, double[] biases, TrainingMode mode)
+            : base (mode)
         {
             int numberOfOutputs = weights.GetLength(0);
             int numberOfInputs = weights.GetLength(1);
@@ -38,7 +39,20 @@ namespace NeuralNet
             _neuralFunction = null;
         }
 
-        public Layer (double[,] weights, ActivationFunction activationfunction, DerivativeFunction derivativefunction, double[] biases = null)
+        public Layer(double[,] weights, double[] biases)
+            : this(weights, biases, TrainingMode.ONLINE)
+        { }
+
+        public Layer(double[,] weights)
+            : this(weights, new double[weights.GetLength(0)], TrainingMode.ONLINE)
+        { }
+
+        public Layer (
+            double[,] weights,
+            double[] biases,
+            ActivationFunction activationfunction, 
+            DerivativeFunction derivativefunction,
+            TrainingMode mode)
             : this (weights, biases)
         {
             if (activationfunction != null && derivativefunction == null)
@@ -47,7 +61,26 @@ namespace NeuralNet
             _neuralFunction = new NeuralFunction(NumberOfOutputs, activationfunction, derivativefunction);
         }
 
+        public Layer(
+            double[,] weights,
+            double[] biases,
+            ActivationFunction activationfunction,
+            DerivativeFunction derivativefunction)
+            : this(weights, biases, activationfunction, derivativefunction, TrainingMode.ONLINE)
+        { }
+
+        public Layer(double[,] weights, ActivationFunction activationfunction, DerivativeFunction derivativefunction)
+            : this(weights)
+        {
+            if (activationfunction != null && derivativefunction == null)
+                throw new ArgumentException("derivativefunction cannot be null, if activatioin is not null");
+
+            _neuralFunction = new NeuralFunction(NumberOfOutputs, activationfunction, derivativefunction);
+        }
+        
+
         protected Layer(Layer layer)
+            : base (layer.Mode)
         {
             if (layer == null)
                 throw new ArgumentException("Attempt to create a LayerBank with a null layer.");

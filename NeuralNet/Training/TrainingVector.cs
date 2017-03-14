@@ -6,20 +6,35 @@ using System.Threading.Tasks;
 
 namespace NeuralNet
 {
-    public class TrainingVector
+    public class VectorPair
     {
         #region protected members
-        public NetworkVector Input { get; protected set; }
-        public NetworkVector Target { get; protected set; }
+        public NetworkVector First { get; protected set; }
+        public NetworkVector Second { get; protected set; }
         #endregion
 
         #region constructors
-        public TrainingVector(NetworkVector input, NetworkVector target)
+        public VectorPair(NetworkVector a, NetworkVector b)
         {
-            Input = input;
-            Target = target;
+            First = a;
+            Second = b;
         }
         #endregion
+    }
 
+
+    public class TrainingVector : VectorPair
+    {
+
+        #region constructors
+        public TrainingVector(NetworkVector input, NetworkVector target)
+            : base (input, target)
+        { }
+        #endregion
+
+        #region public properties
+        public NetworkVector Input { get { return First; } }
+        public NetworkVector Target { get { return Second; } }
+        #endregion
     }
 }

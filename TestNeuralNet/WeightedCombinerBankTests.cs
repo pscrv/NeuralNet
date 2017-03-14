@@ -6,7 +6,7 @@ using NeuralNet;
 namespace TestNeuralNet
 {
     [TestClass]
-    public class WeightedCombinderBankTests
+    public class WeightedCombinerBankTests
     {
         [TestMethod]
         public void CanMakeWeightedCombinerBank()
