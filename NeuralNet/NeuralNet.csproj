@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{15951E5F-C180-444A-841E-2DFCDFEE0F98}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NeuralNet</RootNamespace>
     <AssemblyName>NeuralNet</AssemblyName>
@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -46,9 +49,12 @@
     <Compile Include="Adaptation\AdaptationStrategy.cs" />
     <Compile Include="Algebra\NetworkVector.cs" />
     <Compile Include="NetComponent\Elements\NeuralFunction.cs" />
-    <Compile Include="NetComponent\Elements\WCTrainer.cs" />
+    <Compile Include="NetComponent\NetComponentChain.cs" />
+    <Compile Include="NetComponent\Trainer.cs" />
     <Compile Include="NetComponent\Elements\WeightedCombiner.cs" />
-    <Compile Include="NetComponent\NetworkComponent.cs" />
+    <Compile Include="NetComponent\Layer.cs" />
+    <Compile Include="NetComponent\NetComponent.cs" />
+    <Compile Include="NetComponent\TrainableComponent.cs" />
     <Compile Include="NetworkComponents\Delegates.cs" />
     <Compile Include="NetworkComponents\LayerBank.cs" />
     <Compile Include="NetworkComponents\Layer\Elements\NeuralFunction.cs" />

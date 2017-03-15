@@ -8,6 +8,16 @@ namespace NeuralNet.NetComponent
 {
     public class NeuralFunction : NetComponent
     {
+        public static double __Logistic(double input)
+        {
+            return 1.0 / (1 + Math.Exp(-input));
+        }
+
+        public static double __LogisticDerivative(double input, double output)
+        {
+            return output * (1 - output);
+        }
+
         #region private attributes
         int _numberOfUnits;
         protected ActivationFunction _neuralFunction;

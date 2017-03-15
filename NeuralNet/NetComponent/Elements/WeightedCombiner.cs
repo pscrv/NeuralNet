@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace NeuralNet.NetComponent
 {
-    public class WeightedCombiner : NetComponent
+    public class WeightedCombiner : TrainableComponent
     {
         #region NetworkComponent overrides
         public override int NumberOfInputs { get { return Weights.NumberOfInputs; } }
@@ -23,8 +23,8 @@ namespace NeuralNet.NetComponent
 
         #region public properties
         public NetworkVector Input { get; protected set; }
-        public NetworkVector Biases { get; protected set; }
-        public NetworkMatrix Weights { get; protected set; }
+        public override NetworkVector Biases { get; }
+        public override NetworkMatrix Weights { get; }
         #endregion
 
         #region Constructors
@@ -61,18 +61,18 @@ namespace NeuralNet.NetComponent
         #endregion
 
 
-        #region public methods
-        public NetworkVector BiasesGradient(NetworkVector outputgradient)
+        #region TrainableComponent overrides
+        public override NetworkVector BiasesGradient(NetworkVector outputgradient)
         {
             return outputgradient.Copy();
         }
 
-        public NetworkMatrix WeightsGradient(NetworkVector outputgradient)
+        public override NetworkMatrix WeightsGradient(NetworkVector outputgradient)
         {
             return outputgradient.LeftMultiply(Input);
         }
 
-        public void Update(NetworkVector biasesdelta, NetworkMatrix weightsdelta)
+        public override void Update(NetworkVector biasesdelta, NetworkMatrix weightsdelta)
         {
             Biases.Add(biasesdelta);
             Weights.Add(weightsdelta);

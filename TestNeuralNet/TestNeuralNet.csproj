@@ -57,6 +57,7 @@
     <Compile Include="GradientDescentTests.cs" />
     <Compile Include="LayerBankTests.cs" />
     <Compile Include="LayerTests.cs" />
+    <Compile Include="NetComponentChainTests.cs" />
     <Compile Include="NetworkTests.cs" />
     <Compile Include="NeuralFunctionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

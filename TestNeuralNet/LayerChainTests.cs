@@ -14,8 +14,7 @@ namespace TestNeuralNet
             LayerChain layerlist = new LayerChain();
             Assert.AreNotEqual(null, layerlist);
         }
-
-
+        
         [TestMethod]
         public void CanMakeLayerListWithContent()
         {
@@ -83,7 +82,7 @@ namespace TestNeuralNet
         }
 
         [TestMethod]
-        public void CannotRunWithZeroInput()
+        public void CanRunWithZeroInput()
         {
             Layer layer = new Layer(new double[,] { { 1 } });
             LayerChain layerlist = new LayerChain(layer);

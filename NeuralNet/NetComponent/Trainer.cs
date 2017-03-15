@@ -6,18 +6,18 @@ using System.Threading.Tasks;
 
 namespace NeuralNet.NetComponent
 {
-    public abstract class WCTrainer
+    public abstract class Trainer
     {
         #region protected members
-        protected WeightedCombiner _combiner;
+        protected TrainableComponent _component;
         protected IEnumerable<TrainingVector> _trainingData;
         protected AdaptationStrategy _strategy;
         #endregion
 
         #region constructor
-        public WCTrainer(WeightedCombiner combiner, IEnumerable<TrainingVector> trainingdata)
+        public Trainer(TrainableComponent combiner, IEnumerable<TrainingVector> trainingdata)
         {
-            _combiner = combiner;
+            _component = combiner;
             _trainingData = trainingdata;
             _strategy = new GradientDescent(1.0);
         }
@@ -35,8 +35,8 @@ namespace NeuralNet.NetComponent
 
         protected NetworkVector _getErrorGradient(TrainingVector tv)
         {
-            _combiner.Run(tv.Input);
-            NetworkVector gradient = _combiner.Output.Copy();
+            _component.Run(tv.Input);
+            NetworkVector gradient = _component.Output.Copy();
             gradient.Subtract(tv.Target);
             return gradient;
         }
@@ -45,11 +45,11 @@ namespace NeuralNet.NetComponent
 
 
 
-    public class WCOnlineTrainer : WCTrainer
+    public class OnlineTrainer2 : Trainer
     {
         #region constructors
-        public WCOnlineTrainer(WeightedCombiner combiner, IEnumerable<TrainingVector> trainingdata)
-            : base(combiner, trainingdata)
+        public OnlineTrainer2(TrainableComponent component, IEnumerable<TrainingVector> trainingdata)
+            : base(component, trainingdata)
         { }
         #endregion
 
@@ -57,14 +57,14 @@ namespace NeuralNet.NetComponent
         public override void Train()
         {
             NetworkVector errorGradient;
-            NetworkMatrix weightsDelta = new NetworkMatrix(_combiner.NumberOfOutputs, _combiner.NumberOfInputs);
-            NetworkVector biasDelta = new NetworkVector(_combiner.NumberOfOutputs);
+            NetworkMatrix weightsDelta = new NetworkMatrix(_component.NumberOfOutputs, _component.NumberOfInputs);
+            NetworkVector biasDelta = new NetworkVector(_component.NumberOfOutputs);
             foreach (TrainingVector tv in _trainingData)
             {
                 errorGradient = _getErrorGradient(tv);
-                biasDelta = _combiner.BiasesGradient(errorGradient);
-                weightsDelta = _combiner.WeightsGradient(errorGradient);
-                _combiner.Update(
+                biasDelta = _component.BiasesGradient(errorGradient);
+                weightsDelta = _component.WeightsGradient(errorGradient);
+                _component.Update(
                     _strategy.BiasesUpdate(biasDelta),
                     _strategy.WeightsUpdate(weightsDelta)
                     );              
@@ -74,11 +74,11 @@ namespace NeuralNet.NetComponent
     }
     
     
-    public class WCBatchTrainer : WCTrainer
+    public class BatchTrainer2 : Trainer
     {
         #region constructor
-        public WCBatchTrainer(WeightedCombiner combiner, IEnumerable<TrainingVector> trainingdata)
-            : base (combiner, trainingdata)
+        public BatchTrainer2(TrainableComponent component, IEnumerable<TrainingVector> trainingdata)
+            : base (component, trainingdata)
         { }
         #endregion
 
@@ -86,15 +86,15 @@ namespace NeuralNet.NetComponent
         public override void Train()
         {
             NetworkVector errorGradient;
-            NetworkMatrix weightsDelta = new NetworkMatrix(_combiner.NumberOfOutputs, _combiner.NumberOfInputs);
-            NetworkVector biasDelta = new NetworkVector(_combiner.NumberOfOutputs);
+            NetworkMatrix weightsDelta = new NetworkMatrix(_component.NumberOfOutputs, _component.NumberOfInputs);
+            NetworkVector biasDelta = new NetworkVector(_component.NumberOfOutputs);
             foreach (TrainingVector tv in _trainingData)
             {
                 errorGradient = _getErrorGradient(tv);
-                biasDelta.Add(_combiner.BiasesGradient(errorGradient));
-                weightsDelta.Add(_combiner.WeightsGradient(errorGradient));
+                biasDelta.Add(_component.BiasesGradient(errorGradient));
+                weightsDelta.Add(_component.WeightsGradient(errorGradient));
             }
-            _combiner.Update(
+            _component.Update(
                 _strategy.BiasesUpdate(biasDelta),
                 _strategy.WeightsUpdate(weightsDelta)
                 );

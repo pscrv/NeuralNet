@@ -2,11 +2,344 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using NeuralNet;
+using NeuralNet.NetComponent;
 
 namespace TestNeuralNet
 {
+
     [TestClass]
-    public class LayerTests
+    public class LayerTestsB
+    {
+        [TestMethod]
+        public void CanMakeLayer()
+        {
+            NetworkMatrix weights = new NetworkMatrix( new double[,] { { 1, 2 }, { 3, 4 } } );
+            NeuralNet.NetComponent.Layer2 layer = new NeuralNet.NetComponent.Layer2(weights);
+            Assert.IsNotNull(layer);
+        }
+
+        [TestMethod]
+        public void CanMakeLayerWithBiases()
+        {
+            NetworkMatrix weights = new NetworkMatrix( new double[,] { { 1, 2 }, { 3, 4 } } );
+            NetworkVector biases = new NetworkVector( new double[] { 5, 7 } );
+            NeuralNet.NetComponent.Layer2 layer = new NeuralNet.NetComponent.Layer2(weights, biases);
+            Assert.IsNotNull(layer);
+        }
+
+        [TestMethod]
+        public void CannotMakeLayerWithMismatchedBiases()
+        {
+            NetworkMatrix weights = new NetworkMatrix( new double[,] { { 1, 2 }, { 3, 4 } } );
+            NetworkVector biases = new NetworkVector( new double[] { 5, 7, 11 } );
+            try
+            {
+                NeuralNet.NetComponent.Layer2 layer = new NeuralNet.NetComponent.Layer2(weights, biases);
+                Assert.Fail("ArgumentException expected but not thrown");
+            }
+            catch (ArgumentException)
+            { }
+        }
+
+        [TestMethod]
+        public void NeuralFunctionNotNullRequiresDerivativeNotNull()
+        {
+
+           NetworkMatrix weights = new NetworkMatrix( new double[,] { { 1, 2, 3 }, { 3, 4, 5 } } );
+            NetworkVector biases = new NetworkVector(new double[] { 1, 2 });
+            try
+            {
+                NeuralNet.NetComponent.Layer2 layer = new NeuralNet.NetComponent.Layer2(weights, biases, x => 1.0, null);
+                Assert.Fail("Attempt to create Layer with non-null _neuralFunction and null _neuralFunctioinDerivative should throw and Argument exception, but did not.");
+            }
+            catch (ArgumentException)
+            { }
+        }
+
+        [TestMethod]
+        public void LayerHasRightSize()
+        {
+            NetworkMatrix weights = new NetworkMatrix( new double[,] { { 1, 2, 3 }, { 3, 4, 5 } } );
+            NeuralNet.NetComponent.Layer2 layer = new NeuralNet.NetComponent.Layer2(weights);
+            Assert.AreEqual(3, layer.NumberOfInputs);
+            Assert.AreEqual(2, layer.NumberOfOutputs);
+        }
+
+        [TestMethod]
+        public void UnrunLayerHasZeroOutput()
+        {
+            NetworkMatrix weights = new NetworkMatrix(new double[,] { { 1, 2, 3 }, { 3, 4, 5 } });
+            NeuralNet.NetComponent.Layer2 layer = new NeuralNet.NetComponent.Layer2(weights);
+
+            NetworkVector outputCheck = new NetworkVector(new double[] { 0, 0 });
+            Assert.AreEqual(outputCheck, layer.Output);
+        }
+
+        [TestMethod]
+        public void InputGradientRequiresNonNullInput()
+        {
+            NetworkMatrix weights = new NetworkMatrix( new double[,] { { 1 } } );
+            NeuralNet.NetComponent.Layer2 layer = new NeuralNet.NetComponent.Layer2(weights);
+            try
+            {
+                layer.InputGradient(null);
+                Assert.Fail("Backpropogate should throw an ArgumentException for null input, but did not.");
+            }
+            catch (ArgumentException) { }
+        }
+
+        [TestMethod]
+        public void InputGradientRequiresCorrectInputSize()
+        {
+            NetworkMatrix weights = new NetworkMatrix( new double[,] { { 1 } } );
+            NetworkVector badInput = new NetworkVector(new double[] { 1, 2, 3 });
+            NeuralNet.NetComponent.Layer2 layer = new NeuralNet.NetComponent.Layer2(weights);
+            try
+            {
+                layer.InputGradient(badInput);
+                Assert.Fail("Backpropogate should throw an ArgumentException if input dimension is not equal to NumberOfNeuron, but did not.");
+            }
+            catch (ArgumentException) { }
+        }        
+
+        [TestMethod]
+        public void BackpropagateRuns()
+        {
+            NetworkMatrix weights = new NetworkMatrix( new double[,] { { 1 } } );
+            NetworkVector outputgradient = new NetworkVector(new double[] { 1 });
+            NeuralNet.NetComponent.Layer2 layer = new NeuralNet.NetComponent.Layer2(weights);
+
+            NetworkVector inputGradientCheck = new NetworkVector( new double[] { 1 } );
+            NetworkVector biasesGradientCheck = new NetworkVector(new double[] { 1 });
+            NetworkMatrix weightsGradientCheck = new NetworkMatrix(new double[,] { { 0 } });
+            Assert.AreEqual(inputGradientCheck, layer.InputGradient(outputgradient));
+            Assert.AreEqual(biasesGradientCheck, layer.BiasesGradient(outputgradient));
+            Assert.AreEqual(weightsGradientCheck, layer.WeightsGradient(outputgradient));
+        }
+    }
+
+
+    [TestClass]
+    public class LinearLayerTestsB
+    {
+        [TestMethod]
+        public void LinearLayerHasRightRun()
+        {
+            NetworkMatrix weights = new NetworkMatrix( new double[,] { { 1, 0, 1 }, { 1, 1, 0 } } );
+            NetworkVector biases = new NetworkVector(new double[] { 0, 0 });
+            NetworkVector inputvector = new NetworkVector(new double[] { 1, 2, 3 });
+            NeuralNet.NetComponent.Layer2 layer = NeuralNet.NetComponent.Layer2.CreateLinearLayer(weights, biases);
+            layer.Run(inputvector);
+
+            NetworkVector result = layer.Output;
+            NetworkVector expectedResult = new NetworkVector( new double[] { 4, 3 } );
+            Assert.AreEqual(expectedResult, result);
+        }
+        
+        [TestMethod]
+        public void LinearLayerWithBiasesHasRightRun()
+        {
+            NetworkMatrix weights = new NetworkMatrix(new double[,] { { 1, 0, 1 }, { 1, 1, 0 } });
+            NetworkVector biases = new NetworkVector(new double[] { 4, 3 });
+            NetworkVector inputvector = new NetworkVector(new double[] { 1, 2, 3 });
+            Layer2 layer = Layer2.CreateLinearLayer(weights, biases);
+            layer.Run(inputvector);
+            
+            NetworkVector expectedResult = new NetworkVector( new double[] { 8, 6 });
+            Assert.AreEqual(expectedResult, layer.Output);
+        }
+
+        [TestMethod]
+        public void CanUseBigLinearLayer()
+        {
+            double[,] matrix = new double[2000, 1000];
+            double[] input = new double[1000];
+
+            for (int i = 0; i < 1000; i++)
+            {
+                matrix[i, i] = 1.0;
+                input[i] = (double)i;
+            }
+
+            NetworkMatrix weights = new NetworkMatrix(matrix);
+            NetworkVector inputvector = new NetworkVector(input);
+            Layer2 layer = Layer2.CreateLinearLayer(weights);
+            layer.Run(inputvector);
+            double[] result = layer.Output.ToArray();
+
+            for (int i = 0, j = 1000; i < 1000; i++, j++)
+            {
+                Assert.AreEqual((double)i, result[i], "Failed for i = " + i);
+                Assert.AreEqual(0.0, result[j], "Failed for j = " + j);
+            }
+        }
+        
+        [TestMethod]
+        public void InputGradientRunsWithZeroLayerInput()
+        {
+            NetworkMatrix weights = new NetworkMatrix( new double[,] { { 1 } } );
+            NetworkVector outputgradient = new NetworkVector(new double[] { 1 });
+            Layer2 layer = Layer2.CreateLinearLayer(weights);
+
+            NetworkVector inputGradientCheck = new NetworkVector( new double[] { 1 } );
+            Assert.AreEqual(inputGradientCheck, layer.InputGradient(outputgradient));
+        }
+
+        [TestMethod]
+        public void BackpropagateRunsWithNonzeroLayerInput()
+        {
+            NetworkMatrix weights = new NetworkMatrix( new double[,] { { 1 } } );
+            Layer2 layer = Layer2.CreateLinearLayer(weights);
+
+            NetworkVector layerinput = new NetworkVector(new double[] { 2 });
+            layer.Run(layerinput);
+
+            NetworkVector outputgradient = new NetworkVector(new double[] { 1 });
+
+            NetworkVector inputGradientCheck = new NetworkVector( new double[] { 1 } );
+            Assert.AreEqual(inputGradientCheck, layer.InputGradient(outputgradient));
+        }
+        
+        [TestMethod]
+        public void InputGradientRunsTwoByThree()
+        {
+            NetworkMatrix weights = new NetworkMatrix( new double[,] { { 1, 2, 3 }, { 2, 3, 4 } } );
+            Layer2 layer = Layer2.CreateLinearLayer(weights);
+
+            NetworkVector layerinput = new NetworkVector(new double[] { 1, 0, -1 });
+            layer.Run(layerinput);
+
+            NetworkVector outputgradient = new NetworkVector(new double[] { 1, 1 });
+
+            NetworkVector inputGradientCheck = new NetworkVector( new double[] { 3, 5, 7 } );
+            Assert.AreEqual(inputGradientCheck, layer.InputGradient(outputgradient));
+            
+        }
+
+        [TestMethod]
+        public void BackPropagationIsCorrect()
+        {
+            NetworkMatrix weights = new NetworkMatrix( new double[,] { { 1, 2 }, { 3, 5 } } );
+            Layer2 layer = Layer2.CreateLinearLayer(weights);
+
+            NetworkVector layerinput = new NetworkVector(new double[] { 1, -1 });
+            layer.Run(layerinput);
+
+            NetworkVector outputgradient = new NetworkVector(new double[] { 7, 11 });
+
+            NetworkMatrix weightsGradientCheck = new NetworkMatrix( new double[,] { { 7, -7 }, { 11, -11 } } );
+            Assert.AreEqual(weightsGradientCheck, layer.WeightsGradient(outputgradient));
+
+            NetworkVector biasesGradientCheck = new NetworkVector( new double[] { 7, 11 } );
+            Assert.AreEqual(biasesGradientCheck, layer.BiasesGradient(outputgradient));
+
+            NetworkVector inputGradientCheck = new NetworkVector( new double[] { 40, 69 } );
+            Assert.AreEqual(inputGradientCheck, layer.InputGradient(outputgradient));
+        }
+
+    }
+
+
+
+    [TestClass]
+    public class SigmoidLayerTestsB
+    {
+        ActivationFunction logistic = NeuralNet.NetComponent.NeuralFunction.__Logistic;
+
+
+        [TestMethod]
+        public void CanMakeSigmoidLayer()
+        {
+            NetworkMatrix weights = new NetworkMatrix( new double[,] { { 1, 2 }, { 3, 4 } } );
+            Layer2 layer = Layer2.CreateLogisticLayer(weights);
+            Assert.IsNotNull(layer);
+        }
+
+        [TestMethod]
+        public void SigmoidLayerHasRightRun()
+        {
+            NetworkMatrix weights = new NetworkMatrix( new double[,] { { 1, 0, 1 }, { 1, 1, 0 } } );
+            NetworkVector inputvector = new NetworkVector(new double[] { 1, 2, 3 });
+            Layer2 layer = Layer2.CreateLogisticLayer(weights);
+            layer.Run(inputvector);
+
+            NetworkVector expectedResult = new NetworkVector( new double[] { logistic(4), logistic(3) } );
+            Assert.AreEqual(expectedResult, layer.Output);
+        }
+
+        [TestMethod]
+        public void SigmoidLayerWithBiasesHasRightRun()
+        {
+            NetworkMatrix weights = new NetworkMatrix( new double[,] { { 1, 0, 1 }, { 1, 1, 0 } } );
+            NetworkVector biases = new NetworkVector( new double[] { 4, 3 } );
+            NetworkVector inputvector = new NetworkVector(new double[] { 1, 2, 3 });
+            Layer2 layer = Layer2.CreateLogisticLayer(weights, biases);
+            layer.Run(inputvector);
+            
+            NetworkVector expectedResult = new NetworkVector( new double[] { logistic(8), logistic(6) } );
+            Assert.AreEqual(expectedResult, layer.Output);
+        }
+
+        [TestMethod]
+        public void CanUseBigSigmoidLayer()
+        {
+            double[,] weights = new double[2000, 1000];
+            double[] input = new double[1000];
+
+            for (int i = 0; i < 1000; i++)
+            {
+                weights[i, i] = 1.0;
+                input[i] = (double)i;
+            }
+
+            NetworkVector inputvector = new NetworkVector(input);
+            Layer2 layer = Layer2.CreateLogisticLayer(new NetworkMatrix(weights));
+            layer.Run(inputvector);
+
+            double[] result = layer.Output.ToArray();
+            double sig0 = logistic(0.0);
+            for (int i = 0, j = 1000; i < 1000; i++, j++)
+            {
+                Assert.AreEqual(logistic((double)i), result[i], "Failed for i = " + i);
+                Assert.AreEqual(sig0, result[j], "Failed for j = " + j);
+            }
+        }
+
+        [TestMethod]
+        public void InputGradientRuns()
+        {
+            NetworkMatrix weights = new NetworkMatrix( new double[,] { { 1 } } );
+            NetworkVector outputgradient = new NetworkVector(new double[] { 1 });
+            Layer2 layer = Layer2.CreateLogisticLayer(weights);
+
+            NetworkVector inputGradientCheck = new NetworkVector( new double[] { 0 } );
+            Assert.AreEqual(inputGradientCheck, layer.InputGradient(outputgradient));
+        }
+
+        [TestMethod]
+        public void InputGradientRunsTwoByThree()
+        {
+            NetworkMatrix weights = new NetworkMatrix( new double[,] { { 1, 2, 3 }, { 2, 3, 4 } } );
+            Layer2 layer = Layer2.CreateLogisticLayer(weights);
+
+            NetworkVector layerinput = new NetworkVector(new double[] { 1, 0, -1 });
+            layer.Run(layerinput);
+
+            NetworkVector outputgradient = new NetworkVector(new double[] { 1, 1 });
+
+            NetworkVector inputGradientCheck = new NetworkVector(
+                new double[] { 0.31498075621051952, 0.52496792701753248, 0.7349550978245456 }
+                );
+
+            Assert.AreEqual(inputGradientCheck, layer.InputGradient(outputgradient));            
+        }
+    }
+
+
+
+
+    [TestClass]
+    public class LayerTestsA
     {
         [TestMethod]
         public void CanMakeLayer()
@@ -119,7 +452,7 @@ namespace TestNeuralNet
 
 
     [TestClass]
-    public class LinearLayerTests
+    public class LinearLayerTestsA
     {
         [TestMethod]
         public void LinearLayerHasRightRun()
@@ -270,7 +603,7 @@ namespace TestNeuralNet
 
 
     [TestClass]
-    public class SigmoidLayerTests
+    public class SigmoidLayerTestsA
     {
         private double sigmoid(double x)
         {
