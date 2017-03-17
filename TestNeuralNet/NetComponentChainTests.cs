@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using NeuralNet.NetComponent;
+using NeuralNet;
 using System.Collections.Generic;
 
 namespace TestNeuralNet
@@ -19,7 +19,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void CanMakeWithContent()
         {
-            Layer2 layer = new Layer2(new NeuralNet.NetworkMatrix( new double[,] { { 1 } }) );
+            Layer layer = new Layer(new NeuralNet.NetworkMatrix( new double[,] { { 1 } }) );
             NetComponentChain layerlist = new NetComponentChain(layer);
             Assert.IsNotNull(layerlist);
         }
@@ -53,8 +53,8 @@ namespace TestNeuralNet
         [TestMethod]
         public void CannotAddLayerOfWrongSize()
         {
-            Layer2 layer1 = Layer2.CreateLinearLayer(new NeuralNet.NetworkMatrix( new double[,] { { 1 } }) );
-            Layer2 layer2 = Layer2.CreateLogisticLayer(new NeuralNet.NetworkMatrix( new double[,] { { 1, 2 } }) );
+            Layer layer1 = Layer.CreateLinearLayer(new NeuralNet.NetworkMatrix( new double[,] { { 1 } }) );
+            Layer layer2 = Layer.CreateLogisticLayer(new NeuralNet.NetworkMatrix( new double[,] { { 1, 2 } }) );
             NetComponentChain layerlist = new NetComponentChain(layer1);
 
             try
@@ -69,7 +69,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void UnrunNetworkHasZeroOutput()
         {
-            Layer2 layer = Layer2.CreateLinearLayer(new NeuralNet.NetworkMatrix(new double[,] { { 1 }, { 2 }, { 3 } }));
+            Layer layer = Layer.CreateLinearLayer(new NeuralNet.NetworkMatrix(new double[,] { { 1 }, { 2 }, { 3 } }));
             NetComponentChain layerlist = new NetComponentChain(layer);
             NeuralNet.NetworkVector outputCheck = new NeuralNet.NetworkVector(new double[] { 0, 0, 0 });
             Assert.AreEqual(outputCheck, layerlist.Output);
@@ -78,7 +78,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void CannotRunWithInputOfWrongSize()
         {
-            Layer2 layer = Layer2.CreateLinearLayer(new NeuralNet.NetworkMatrix( new double[,] { { 1 } }) );
+            Layer layer = Layer.CreateLinearLayer(new NeuralNet.NetworkMatrix( new double[,] { { 1 } }) );
             NetComponentChain layerlist = new NetComponentChain(layer);
             NeuralNet.NetworkVector input = new NeuralNet.NetworkVector(new double[] { 0, 0 });
 
@@ -94,7 +94,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void CanRunWithZeroInput()
         {
-            Layer2 layer = Layer2.CreateLinearLayer(new NeuralNet.NetworkMatrix( new double[,] { { 1 } }) );
+            Layer layer = Layer.CreateLinearLayer(new NeuralNet.NetworkMatrix( new double[,] { { 1 } }) );
             NetComponentChain layerlist = new NetComponentChain(layer);
             NeuralNet.NetworkVector vector = new NeuralNet.NetworkVector(new double[] { 0 });
             layerlist.Run(vector);
@@ -104,8 +104,8 @@ namespace TestNeuralNet
         [TestMethod]
         public void CanRunTwoLayersWithZeroInput()
         {
-            Layer2 layer1 = new Layer2(new NeuralNet.NetworkMatrix( new double[,] { { 1, 1 }, { 1, 1 } } ));
-            Layer2 layer2 = Layer2.CreateLinearLayer(new NeuralNet.NetworkMatrix( new double[,] { { 1, 1 } } ));
+            Layer layer1 = new Layer(new NeuralNet.NetworkMatrix( new double[,] { { 1, 1 }, { 1, 1 } } ));
+            Layer layer2 = Layer.CreateLinearLayer(new NeuralNet.NetworkMatrix( new double[,] { { 1, 1 } } ));
             NetComponentChain layerlist = new NetComponentChain(layer1);
             layerlist.AddFixed(layer2);
             NeuralNet.NetworkVector vector = new NeuralNet.NetworkVector(new double[] { 0, 0 });
@@ -119,8 +119,8 @@ namespace TestNeuralNet
         [TestMethod]
         public void CanRunTwoLayerNetWithOneInput()
         {
-            Layer2 inputlayer = new Layer2(new NeuralNet.NetworkMatrix(new double[,] { { 1, 1, 1 }, { 1, 1, 1 } }));
-            Layer2 outputlayer = Layer2.CreateLinearLayer(new NeuralNet.NetworkMatrix(new double[,] { { 1, 1 } }));
+            Layer inputlayer = new Layer(new NeuralNet.NetworkMatrix(new double[,] { { 1, 1, 1 }, { 1, 1, 1 } }));
+            Layer outputlayer = Layer.CreateLinearLayer(new NeuralNet.NetworkMatrix(new double[,] { { 1, 1 } }));
             NetComponentChain network = new NetComponentChain();
             network.AddFixed(inputlayer);
             network.AddTrainable(outputlayer);
@@ -135,8 +135,8 @@ namespace TestNeuralNet
         [TestMethod]
         public void CanBackPropagateTwoLayerNetGradient1()
         {
-            Layer2 inputlayer = new Layer2(new NeuralNet.NetworkMatrix(new double[,] { { 1, 1, 1 }, { 1, 1, 1 } }));
-            Layer2 outputlayer = Layer2.CreateLinearLayer(new NeuralNet.NetworkMatrix(new double[,] { { 1, 1 } }));
+            Layer inputlayer = new Layer(new NeuralNet.NetworkMatrix(new double[,] { { 1, 1, 1 }, { 1, 1, 1 } }));
+            Layer outputlayer = Layer.CreateLinearLayer(new NeuralNet.NetworkMatrix(new double[,] { { 1, 1 } }));
             NetComponentChain network = new NetComponentChain();
             network.AddFixed(inputlayer);
             network.AddTrainable(outputlayer);

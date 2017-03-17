@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using NeuralNet;
-using System.Collections.Generic;
 
 namespace TestNeuralNet
 {
@@ -144,90 +143,6 @@ namespace TestNeuralNet
         }
 
 
-        [TestMethod]
-        public void TrainOnline_SmallNet_Correct()
-        {
-            int inputs = 3;
-            int inputneurons = 2;
-            int outputneurons = 1;
-            
-            LinearTwoLayerTestNetwork network = new LinearTwoLayerTestNetwork(inputs, inputneurons, outputneurons);
-            List<TrainingVector> trainingVectors = new List<TrainingVector>
-            {
-                new TrainingVector(
-                    new NetworkVector( new double[] { 0, 0, 0 } ),
-                    new NetworkVector( new double[] { 1 })
-                    ),
-                new TrainingVector(
-                    new NetworkVector( new double[] { 1, 0, 0 } ),
-                    new NetworkVector( new double[] { 0 })
-                    ),
-                new TrainingVector(
-                    new NetworkVector( new double[] { 0, 1, 0 } ),
-                    new NetworkVector( new double[] { 0 })
-                    ),
-                new TrainingVector(
-                    new NetworkVector( new double[] { 1, 1, 0 } ),
-                    new NetworkVector( new double[] { 1 })
-                    )
-            };
-
-            NetworkTrainer trainer = new OnlineNetworkTrainer(network, trainingVectors);
-            trainer.Train();
-
-            NetworkMatrix inputWeightsCheck = new NetworkMatrix(new double[,] { { -35499715, -35499260, 1 },{ -35499715, -35499260, 1 }});
-            NetworkVector inputBiasesCheck = new NetworkVector(new double[] { -35499265, -35499265 });
-            NetworkMatrix outputWeightsCheck = new NetworkMatrix(new double[,] { { -224831362, -224831362 } });
-            NetworkVector outputBiasesCheck = new NetworkVector(new double[] {-251825});
-
-            Assert.AreEqual(inputWeightsCheck, network.InputLayer.Weights);
-            Assert.AreEqual(inputBiasesCheck, network.InputLayer.Biases);
-            Assert.AreEqual(outputWeightsCheck, network.OutputLayer.Weights);
-            Assert.AreEqual(outputBiasesCheck, network.OutputLayer.Biases);
-        }
-
-
-        [TestMethod]
-        public void TrainBatch_SmallNet_Correct()
-        {
-            int inputs = 3;
-            int inputneurons = 2;
-            int outputneurons = 1;
-
-            LinearTwoLayerTestNetwork network = new LinearTwoLayerTestNetwork(inputs, inputneurons, outputneurons);
-            List<TrainingVector> trainingVectors = new List<TrainingVector>
-            {
-                new TrainingVector(
-                    new NetworkVector( new double[] { 0, 0, 0 } ),
-                    new NetworkVector( new double[] { 1 })
-                    ),
-                new TrainingVector(
-                    new NetworkVector( new double[] { 1, 0, 0 } ),
-                    new NetworkVector( new double[] { 0 })
-                    ),
-                new TrainingVector(
-                    new NetworkVector( new double[] { 0, 1, 0 } ),
-                    new NetworkVector( new double[] { 0 })
-                    ),
-                new TrainingVector(
-                    new NetworkVector( new double[] { 1, 1, 0 } ),
-                    new NetworkVector( new double[] { 1 })
-                    )
-            };
-
-            NetworkTrainer trainer = new BatchNetworkTrainer(network, trainingVectors);
-            trainer.Train();
-
-            NetworkMatrix inputWeightsCheck = new NetworkMatrix(new double[,] { { -4, -4, 1 }, { -4, -4, 1 } });
-            NetworkVector inputBiasesCheck = new NetworkVector(new double[] { -6, -6 });
-            NetworkMatrix outputWeightsCheck = new NetworkMatrix(new double[,] { { -9, -9 } });
-            NetworkVector outputBiasesCheck = new NetworkVector(new double[] { -6 });
-
-            Assert.AreEqual(inputWeightsCheck, network.InputLayer.Weights);
-            Assert.AreEqual(inputBiasesCheck, network.InputLayer.Biases);
-            Assert.AreEqual(outputWeightsCheck, network.OutputLayer.Weights);
-            Assert.AreEqual(outputBiasesCheck, network.OutputLayer.Biases);
-        }
 
 
 

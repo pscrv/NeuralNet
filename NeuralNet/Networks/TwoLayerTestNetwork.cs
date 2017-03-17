@@ -26,8 +26,10 @@ namespace NeuralNet
                 for (int j = 0; j < inputneurons; j++)
                     outputWeights[i, j] = 1;
 
-            InputLayer = new LinearLayer(inputWeights);
-            OutputLayer = new LinearLayer(outputWeights);
+            
+
+            InputLayer = Layer.CreateLinearLayer(new NetworkMatrix(inputWeights), new NetworkVector(inputneurons));
+            OutputLayer = Layer.CreateLinearLayer(new NetworkMatrix(outputWeights), new NetworkVector(outputneurons));
         }
 
         public void Run(NetworkVector input)
@@ -36,11 +38,34 @@ namespace NeuralNet
             OutputLayer.Run(InputLayer.Output);
         }
 
-        public void BackPropagate(NetworkVector outputgradient)
+        public NetworkVector InputGradient(NetworkVector outputgradient)
         {
-            OutputLayer.BackPropagate(outputgradient);
-            InputLayer.BackPropagate(OutputLayer.InputGradient);
+            return InputLayer.InputGradient(OutputLayer.InputGradient(outputgradient));
         }
+
+
+
+        #region tryout
+        public IEnumerable<StateGradient> GradientBackPropagator(NetworkVector outputgradient)
+        {
+            List<NetComponent> components = new List<NetComponent> { OutputLayer, InputLayer };
+
+            NetworkVector gradient = outputgradient;
+            NetworkVector oldGradient;
+            foreach (NetComponent component in components)
+            {
+                if (component is TrainableComponent)
+                {
+                    // need to get gradient before yield, because
+                    // state of component is likely to change between yields
+                    oldGradient = gradient;
+                    gradient = component.InputGradient(gradient);
+                    yield return (component as TrainableComponent).GetStateGradient(oldGradient);
+                }
+
+            }
+        }
+        #endregion
 
     }
 }

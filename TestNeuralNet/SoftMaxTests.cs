@@ -8,10 +8,17 @@ namespace TestNeuralNet
     [TestClass]
     public class SoftMaxTests
     {
+        //[TestMethod]
+        //public void CanMakeSoftMax()
+        //{
+        //    Assert.Fail("Need to adapt soft-max unit.");
+        //}
+
         [TestMethod]
         public void CanMakeSoftMax()
         {
-            SoftMaxUnit smu = new SoftMaxUnit(1);
+            //SoftMaxUnit smu = new SoftMaxUnit(1);
+            SoftMaxUnit smu = new SoftMaxUnit();  // just a flag, so we do not forget to adapt
             Assert.AreNotEqual(null, smu);
         }
 
@@ -39,7 +46,7 @@ namespace TestNeuralNet
         public void CannotRunWithWrongSizedInput()
         {
             SoftMaxUnit smu = new SoftMaxUnit(7);
-            NetworkVector badinput = new NetworkVector( new double[] { 1, 2, 3} );
+            NetworkVector badinput = new NetworkVector(new double[] { 1, 2, 3 });
             try
             {
                 smu.Run(badinput);
@@ -53,7 +60,7 @@ namespace TestNeuralNet
         public void RunProducesCorrectOutput()
         {
             SoftMaxUnit smu = new SoftMaxUnit(7);
-            NetworkVector inputs = new NetworkVector( new double[] { 1, 0, 0, 0, 0, 0, 1 });
+            NetworkVector inputs = new NetworkVector(new double[] { 1, 0, 0, 0, 0, 0, 1 });
 
             smu.Run(inputs);
 
@@ -75,7 +82,7 @@ namespace TestNeuralNet
 
 
         [TestMethod]
-        public void CannotBackPropagateWithWrongSizedOutputGradient()
+        public void CannotRunInputGradientWithWrongSizedOutputGradient()
         {
             SoftMaxUnit smu = new SoftMaxUnit(3);
             NetworkVector goodinput = new NetworkVector(new double[] { 1, 2, 3 });
@@ -83,36 +90,37 @@ namespace TestNeuralNet
             smu.Run(goodinput);
             try
             {
-                smu.BackPropagate(badgradient);
+                smu.InputGradient(badgradient);
                 Assert.Fail("Run failed to throw an ArgumentException when the input size did not match the number of units.");
             }
             catch (ArgumentException) { }
         }
 
         [TestMethod]
-        public void BackPropagationProducesCorrectInputGradient()
+        public void InputGradientIsCorrect()
         {
             SoftMaxUnit smu = new SoftMaxUnit(7);
             NetworkVector inputs = new NetworkVector(new double[] { 0, 1, 0, 0, 1, 0, 0 });
             NetworkVector outputgradient = new NetworkVector(new double[] { 1, 1, 0, 0, 0, 0, 0 });
 
             smu.Run(inputs);
-            smu.BackPropagate(outputgradient);
+            NetworkVector inputGradient =  smu.InputGradient(outputgradient);
 
             double sum = 5 + (2 * Math.E);
             double one_value = Math.E / sum;
             double one_derivative = one_value * (1 - one_value);
             double zero_value = 1 / sum;
             double zero_derivative = zero_value * (1 - zero_value);
-            double delta = 0.000000001;
 
-            double[] inputgradientvalues = smu.InputGradient.ToArray();
-            Assert.AreEqual(zero_derivative, inputgradientvalues[0], delta);
-            Assert.AreEqual(one_derivative, inputgradientvalues[1], delta);
-            for (int i = 2; i < smu.NumberOfOutputs; i++)
+            NetworkVector inputGradientCheck = new NetworkVector(new double[]
             {
-                Assert.AreEqual(0, inputgradientvalues[i], delta);
+                zero_derivative,
+                one_derivative,
+                0, 0, 0, 0 , 0
             }
+            );
+            Assert.AreEqual(inputGradientCheck, inputGradient);
+            
         }
     }
 }

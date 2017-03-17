@@ -2,16 +2,15 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using NeuralNet;
-using NeuralNet.NetComponent;
 
 namespace TestNeuralNet
 {
     [TestClass]
     public class WeightedCombinerTests
     {
-        NeuralNet.NetComponent.WeightedCombiner wc_2;
-        NeuralNet.NetComponent.WeightedCombiner wc_1;
-        NeuralNet.NetComponent.WeightedCombiner wc_1b;
+        WeightedCombiner wc_2;
+        WeightedCombiner wc_1;
+        WeightedCombiner wc_1b;
 
         NetworkMatrix matrix_1 = new NetworkMatrix(new double[,] { { 1 } });
         NetworkMatrix matrix_2 = new NetworkMatrix(new double[,] { { 1, 2, 3 }, { 2, 3, 4 } });
@@ -23,9 +22,9 @@ namespace TestNeuralNet
 
         public WeightedCombinerTests()
         {
-            wc_1 = new NeuralNet.NetComponent.WeightedCombiner(matrix_1);
-            wc_1b = new NeuralNet.NetComponent.WeightedCombiner(matrix_1, vector_1);
-            wc_2 = new NeuralNet.NetComponent.WeightedCombiner(matrix_2, vector_2);
+            wc_1 = new WeightedCombiner(matrix_1);
+            wc_1b = new WeightedCombiner(matrix_1, vector_1);
+            wc_2 = new WeightedCombiner(matrix_2, vector_2);
         }
 
         [TestMethod]

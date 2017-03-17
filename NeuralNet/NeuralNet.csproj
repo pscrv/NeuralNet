@@ -48,37 +48,30 @@
   <ItemGroup>
     <Compile Include="Adaptation\AdaptationStrategy.cs" />
     <Compile Include="Algebra\NetworkVector.cs" />
+    <Compile Include="NetComponent\ChainTrainer.cs" />
     <Compile Include="NetComponent\Elements\NeuralFunction.cs" />
     <Compile Include="NetComponent\NetComponentChain.cs" />
-    <Compile Include="NetComponent\Trainer.cs" />
+    <Compile Include="Networks\NetworkTrainer.cs" />
+    <Compile Include="Training\ComponentTrainer.cs" />
     <Compile Include="NetComponent\Elements\WeightedCombiner.cs" />
     <Compile Include="NetComponent\Layer.cs" />
     <Compile Include="NetComponent\NetComponent.cs" />
     <Compile Include="NetComponent\TrainableComponent.cs" />
-    <Compile Include="NetworkComponents\Delegates.cs" />
-    <Compile Include="NetworkComponents\LayerBank.cs" />
-    <Compile Include="NetworkComponents\Layer\Elements\NeuralFunction.cs" />
-    <Compile Include="NetworkComponents\Layer\LayerBase.cs" />
-    <Compile Include="NetworkComponents\Layer\LayerState.cs" />
-    <Compile Include="NetworkComponents\Layer\Elements\WeightedCombiner.cs" />
-    <Compile Include="NetworkComponents\Layer\LayerChain.cs" />
-    <Compile Include="NetworkComponents\Layer\Linear.cs" />
     <Compile Include="Algebra\NetworkMatrix.cs" />
-    <Compile Include="NetworkComponents\Layer\Sigmoid.cs" />
-    <Compile Include="NetworkComponents\NetworkComponent.cs" />
-    <Compile Include="NetworkComponents\SpecialComponents\SoftMaxUnit.cs" />
-    <Compile Include="NetworkComponents\NetworkComponentChain.cs" />
-    <Compile Include="Networks\SimpleNetwork.cs" />
     <Compile Include="Networks\TwoLayerTestNetwork.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Training\Trainer.cs" />
     <Compile Include="Training\TrainingVector.cs" />
+    <Compile Include="NetComponent\Elements\Delegates.cs" />
+    <Compile Include="NetComponent\Elements\SoftMaxUnit.cs" />
+    <Compile Include="NetComponent\LayerBank.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="__OLD__\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

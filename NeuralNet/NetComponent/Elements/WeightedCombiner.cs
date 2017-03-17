@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace NeuralNet.NetComponent
+namespace NeuralNet
 {
     public class WeightedCombiner : TrainableComponent
     {

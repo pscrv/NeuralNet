@@ -1,30 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace NeuralNet.NetComponent
+namespace NeuralNet
 {
-    public class Layer2 : TrainableComponent
+    public class Layer : TrainableComponent
     {
         #region static
-        public static Layer2 CreateLinearLayer(NetworkMatrix weights, NetworkVector biases)
+        public static Layer CreateLinearLayer(NetworkMatrix weights, NetworkVector biases)
         {
-            return new Layer2(weights, biases, null, null);
+            return new Layer(weights, biases, null, null);
         }
 
-        public static Layer2 CreateLinearLayer(NetworkMatrix weights)
+        public static Layer CreateLinearLayer(NetworkMatrix weights)
         {
-            return new Layer2(weights, new NetworkVector(weights.NumberOfOutputs), null, null);
+            return new Layer(weights, new NetworkVector(weights.NumberOfOutputs), null, null);
         }
 
 
-        public static Layer2 CreateLogisticLayer(NetworkMatrix weights, NetworkVector biases)
+        public static Layer CreateLogisticLayer(NetworkMatrix weights, NetworkVector biases)
         {
-            return new Layer2(weights, biases, NeuralFunction.__Logistic, NeuralFunction.__LogisticDerivative);
+            return new Layer(weights, biases, NeuralFunction.__Logistic, NeuralFunction.__LogisticDerivative);
         }
 
-        public static Layer2 CreateLogisticLayer(NetworkMatrix weights)
+        public static Layer CreateLogisticLayer(NetworkMatrix weights)
         {
-            return new Layer2(weights, new NetworkVector(weights.NumberOfOutputs), NeuralFunction.__Logistic, NeuralFunction.__LogisticDerivative);
+            return new Layer(weights, new NetworkVector(weights.NumberOfOutputs), NeuralFunction.__Logistic, NeuralFunction.__LogisticDerivative);
         }
         #endregion
 
@@ -88,7 +88,7 @@ namespace NeuralNet.NetComponent
                 
 
         #region constructors
-        public Layer2 (
+        public Layer (
             NetworkMatrix weights,
             NetworkVector biases,
             ActivationFunction activationfunction, 
@@ -113,11 +113,11 @@ namespace NeuralNet.NetComponent
             }
         }
 
-        public Layer2(NetworkMatrix weights, NetworkVector biases)
+        public Layer(NetworkMatrix weights, NetworkVector biases)
             : this (weights, biases, null, null)
         { }
         
-        public Layer2(NetworkMatrix weights)
+        public Layer(NetworkMatrix weights)
             : this(weights, new NetworkVector(weights.NumberOfOutputs), null, null)
         { }
         #endregion

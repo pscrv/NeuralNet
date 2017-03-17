@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using NeuralNet.NetComponent;
 using NeuralNet;
 
 namespace TestNeuralNet
@@ -19,13 +18,13 @@ namespace TestNeuralNet
             return output * (1 - output);
         }
 
-        NeuralNet.NetComponent.NeuralFunction nf_1 = new NeuralNet.NetComponent.NeuralFunction(1);
+        NeuralFunction nf_1 = new NeuralFunction(1);
 
-        NeuralNet.NetComponent.NeuralFunction nf_linear = 
-            new NeuralNet.NetComponent.NeuralFunction(2, x => x, (x, y) => 1);
+        NeuralFunction nf_linear = 
+            new NeuralFunction(2, x => x, (x, y) => 1);
 
-        NeuralNet.NetComponent.NeuralFunction nf_sigmoid 
-            = new NeuralNet.NetComponent.NeuralFunction(2, sigmoid, sigmoidDerivative);
+        NeuralFunction nf_sigmoid 
+            = new NeuralFunction(2, sigmoid, sigmoidDerivative);
 
         NetworkVector vector_1 = new NetworkVector(new double[] { 1 });
         NetworkVector vector_2 = new NetworkVector(new double[] { 1, 2 });

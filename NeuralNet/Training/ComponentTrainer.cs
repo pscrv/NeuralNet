@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NeuralNet.NetComponent
+namespace NeuralNet
 {
-    public abstract class Trainer
+    public abstract class ComponentTrainer
     {
         #region protected members
         protected TrainableComponent _component;
@@ -15,7 +15,7 @@ namespace NeuralNet.NetComponent
         #endregion
 
         #region constructor
-        public Trainer(TrainableComponent combiner, IEnumerable<TrainingVector> trainingdata)
+        public ComponentTrainer(TrainableComponent combiner, IEnumerable<TrainingVector> trainingdata)
         {
             _component = combiner;
             _trainingData = trainingdata;
@@ -45,10 +45,10 @@ namespace NeuralNet.NetComponent
 
 
 
-    public class OnlineTrainer2 : Trainer
+    public class OnlineTrainer : ComponentTrainer
     {
         #region constructors
-        public OnlineTrainer2(TrainableComponent component, IEnumerable<TrainingVector> trainingdata)
+        public OnlineTrainer(TrainableComponent component, IEnumerable<TrainingVector> trainingdata)
             : base(component, trainingdata)
         { }
         #endregion
@@ -74,10 +74,10 @@ namespace NeuralNet.NetComponent
     }
     
     
-    public class BatchTrainer2 : Trainer
+    public class BatchTrainer : ComponentTrainer
     {
         #region constructor
-        public BatchTrainer2(TrainableComponent component, IEnumerable<TrainingVector> trainingdata)
+        public BatchTrainer(TrainableComponent component, IEnumerable<TrainingVector> trainingdata)
             : base (component, trainingdata)
         { }
         #endregion
