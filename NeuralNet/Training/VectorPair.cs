@@ -20,21 +20,5 @@ namespace NeuralNet
             Second = b;
         }
         #endregion
-    }
-
-
-    public class TrainingVector : VectorPair
-    {
-
-        #region constructors
-        public TrainingVector(NetworkVector input, NetworkVector target)
-            : base (input, target)
-        { }
-        #endregion
-
-        #region public properties
-        public NetworkVector Input { get { return First; } }
-        public NetworkVector Target { get { return Second; } }
-        #endregion
-    }
+    }    
 }

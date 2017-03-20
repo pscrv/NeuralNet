@@ -126,9 +126,8 @@ namespace TestNeuralNet
             wc_2.Run(vector_3);
 
             AdaptationStrategy strategy = new GradientDescent(1.0);
-            wc_2.Update(
-                strategy.BiasesUpdate(wc_2.BiasesGradient(vector_2)),
-                strategy.WeightsUpdate(wc_2.WeightsGradient(vector_2)));
+            wc_2.BackPropagate(vector_2);
+            wc_2.Update(strategy);
             
             NetworkVector biasesCheck = new NetworkVector(new double[] { 0, 0});
             NetworkMatrix weightsCheck = new NetworkMatrix(new double[,] { { 1 - (11 * 111), 2 - (11 * 112), 3 - (11 * 113) }, { 2 -  (12 * 111), 3 - (12 * 112), 4 - (12 * 113) } });

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace NeuralNet
 {
 
-    public class NetComponentChain : NetComponent
+    public class NetComponentChain : NetComponent, ITrainable
     {
         #region protected members
         protected _networkComponentNode _head;
@@ -39,10 +39,8 @@ namespace NeuralNet
         #region NetComponent overrides
         public override int NumberOfInputs { get { return _head.Component.NumberOfInputs; } }
         public override int NumberOfOutputs { get { return _tail.Component.NumberOfOutputs; } }
-        public override NetworkVector Output {
-            get { return _tail.Component.Output; }
-            protected set { }
-        }
+        public override NetworkVector Input { get { return _head.Component.Input; } protected set { } }
+        public override NetworkVector Output { get { return _tail.Component.Output; } protected set { } }
 
         public override NetworkVector InputGradient(NetworkVector outputgradient)
         {
@@ -85,20 +83,17 @@ namespace NeuralNet
 
             }
         }
-        #endregion
 
-
-
-        #region public methods
-        public virtual void AddFixed(NetComponent componentToAdd)
+        public void AddFixed(NetComponent componentToAdd)
         {
             _addComponent(componentToAdd, istrainable: false);
         }
 
-        public virtual void AddTrainable(TrainableComponent componentToAdd)
+        public void AddTrainable(TrainableComponent componentToAdd)
         {
             _addComponent(componentToAdd, istrainable: true);
         }
+
         public override void Run(NetworkVector input)
         {
             if (NumberOfComponents == 0)
@@ -113,12 +108,11 @@ namespace NeuralNet
                 input = component.Output;
             }
         }
-
         #endregion
 
 
         #region protected and private methods
-        protected virtual void _addComponent(NetComponent componentToAdd, bool istrainable)
+        protected void _addComponent(NetComponent componentToAdd, bool istrainable)
         {
             if (_componentHasWrongSize(componentToAdd))
                 throw new ArgumentException("Attempt to add with inputs size differnt from output size of the last existing Layer");
@@ -147,6 +141,36 @@ namespace NeuralNet
         }
         #endregion
 
+
+        #region ITrainable
+        public void BackPropagate(NetworkVector outputgradient)
+        {
+            NetworkVector currentGradient = outputgradient.Copy();
+            TrainableComponent currentComponent;
+            _networkComponentNode node = _tail;
+            {
+                while (node != null)
+                {
+                    currentComponent = node.Component as TrainableComponent;
+                    if (node.IsTrainable)
+                    {
+                        currentComponent.BackPropagate(currentGradient);
+                    }
+
+                    currentGradient = currentComponent.InputGradient(currentGradient);
+                    node = node.Previous;
+                }
+            }
+        }
+
+        public void Update(AdaptationStrategy strategy)
+        {
+            foreach (TrainableComponent component in BackwardsTrainableComponentEnumeration)
+            {
+                component.Update(strategy);
+            }
+        }
+        #endregion
 
         #region IEnumerable
         public IEnumerable<NetComponent> ForwardEnumeration
@@ -205,13 +229,13 @@ namespace NeuralNet
                     node = node.Previous;
                 }
             }
-        }
+        }      
         #endregion
 
 
 
 
-        #region private subclass of LayerListNode
+        #region protected subclass of LayerListNode
         protected class _networkComponentNode
         {
             public NetComponent Component { get; protected set; }
@@ -227,5 +251,4 @@ namespace NeuralNet
         }
         #endregion
     }
-
 }

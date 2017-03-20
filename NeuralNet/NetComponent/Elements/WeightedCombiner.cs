@@ -5,45 +5,52 @@ namespace NeuralNet
 {
     public class WeightedCombiner : TrainableComponent
     {
+
         #region NetworkComponent overrides
         public override int NumberOfInputs { get { return Weights.NumberOfInputs; } }
         public override int NumberOfOutputs { get { return Weights.NumberOfOutputs; } }
         
-        public override NetworkVector Output { get; protected set; }
+        public override NetworkVector Input { get { return _input; } protected set { _input = value; } }
+        public override NetworkVector Output { get { return _output; } protected set { _output = value; } }
 
         public override void Run(NetworkVector inputvalues)
         {
             if (inputvalues.Dimension != NumberOfInputs)
                 throw new ArgumentException("The dimension of the input does not match this WeightedCombinger.");
+
             Input = inputvalues;
-            Output = Biases.SumWith(Weights.LeftMultiply(Input));
+            Output = Biases.SumWith(Weights.LeftMultiply(inputvalues));
 
         }
         #endregion
 
+        #region protected attributes
+        protected NetworkVector _input;
+        protected NetworkVector _output;
+        #endregion
+
         #region public properties
-        public NetworkVector Input { get; protected set; }
         public override NetworkVector Biases { get; }
         public override NetworkMatrix Weights { get; }
         #endregion
 
         #region Constructors
         public WeightedCombiner(NetworkMatrix weights, NetworkVector biases)
+            : base (weights.NumberOfOutputs, weights.NumberOfInputs)
         {
             if (weights == null)
-                throw new ArgumentException("Attempt to create a WeightedCombiner with null weights.");
+                throw new ArgumentException("Attempt to make a WeightedCombineer with weights == null.");
 
             if (biases == null)
-                throw new ArgumentException("Attempt to create a WeightedCombiner with null biases.");
+                throw new ArgumentException("Attempt to make a WeightedCombineer with biases == null.");
 
             if (biases.Dimension != weights.NumberOfOutputs)
                 throw new ArgumentException("Dimension of biases must the the same of the outputs.");
 
             Weights = weights.Copy();
             Biases = biases.Copy();
-
-            Input = new NetworkVector(NumberOfInputs);
-            Output = new NetworkVector(NumberOfOutputs);
+            _input = new NetworkVector(weights.NumberOfInputs);
+            _output = new NetworkVector(weights.NumberOfOutputs);
         }
         
         public WeightedCombiner(NetworkMatrix weights)
@@ -51,10 +58,8 @@ namespace NeuralNet
         
         
         public WeightedCombiner(WeightedCombiner combiner)
+            : base (combiner.NumberOfOutputs, combiner.NumberOfInputs)
         {
-            if (combiner == null)
-                throw new ArgumentException("Attempt to make a WeightedCombiner from null");
-
             this.Biases = combiner.Biases.Copy();
             this.Weights = combiner.Weights.Copy();
         }
@@ -72,10 +77,12 @@ namespace NeuralNet
             return outputgradient.LeftMultiply(Input);
         }
 
-        public override void Update(NetworkVector biasesdelta, NetworkMatrix weightsdelta)
+        public override void Update(AdaptationStrategy strategy)
         {
-            Biases.Add(biasesdelta);
-            Weights.Add(weightsdelta);
+            Biases.Add(strategy.BiasesUpdate(_biasesGradientAccumulator));
+            Weights.Add(strategy.WeightsUpdate(_weightsGradientAccumulator));
+            _biasesGradientAccumulator.Zero();
+            _weightsGradientAccumulator.Zero();
         }
 
         public override NetworkVector InputGradient(NetworkVector outputgradient)
@@ -84,6 +91,12 @@ namespace NeuralNet
                 throw new ArgumentException("outputgradient may not be null and must have dimension equal to NumberOfNeurons.");
 
             return Weights.DotWithWeightsPerInput(outputgradient);
+        }
+
+        public override void BackPropagate(NetworkVector outputgradient)
+        {
+            _biasesGradientAccumulator.Add(BiasesGradient(outputgradient));
+            _weightsGradientAccumulator.Add(WeightsGradient(outputgradient));
         }
         #endregion
     }

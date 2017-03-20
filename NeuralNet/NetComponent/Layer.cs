@@ -38,8 +38,8 @@ namespace NeuralNet
         #region NetComponent overrides
         public override int NumberOfInputs { get { return _combiner.NumberOfInputs; } }
         public override int NumberOfOutputs { get { return _combiner.NumberOfOutputs; } }
-        public override NetworkVector Output
-        {
+        public override NetworkVector Input { get { return _combiner.Input; } protected set { } }
+        public override NetworkVector Output { 
             get
             {
                 if (_neuralFunction == null)
@@ -48,7 +48,7 @@ namespace NeuralNet
                 return _neuralFunction.Output;
             }
 
-            protected set { Output = value; }
+            protected set { }
         }
 
         public override NetworkVector InputGradient(NetworkVector outputgradient)
@@ -60,6 +60,7 @@ namespace NeuralNet
         {
             if (inputvalues.Dimension != NumberOfInputs)
                 throw new ArgumentException("Input dimension does not match this Layer.");
+
             _combiner.Run(inputvalues);
             if (_neuralFunction != null)
                 _neuralFunction.Run(_combiner.Output);
@@ -79,13 +80,23 @@ namespace NeuralNet
         {
             return _combiner.WeightsGradient(_getActivationGradient(outputgradient));
         }
+      
 
-        public override void Update(NetworkVector biasesdelta, NetworkMatrix weightsdelta)
+        public override void Update(AdaptationStrategy strategy)
         {
-            _combiner.Update(biasesdelta, weightsdelta);
+            Biases.Add(strategy.BiasesUpdate( _biasesGradientAccumulator));
+            Weights.Add(strategy.WeightsUpdate( _weightsGradientAccumulator));
+            _biasesGradientAccumulator.Zero();
+            _weightsGradientAccumulator.Zero();
+        }
+
+        public override void BackPropagate(NetworkVector outputgradient)
+        {
+            _biasesGradientAccumulator.Add(BiasesGradient(outputgradient));
+            _weightsGradientAccumulator.Add(WeightsGradient(outputgradient));
         }
         #endregion
-                
+
 
         #region constructors
         public Layer (
@@ -94,6 +105,7 @@ namespace NeuralNet
             ActivationFunction activationfunction, 
             DerivativeFunction derivativefunction
             )
+            : base (weights.NumberOfOutputs, weights.NumberOfInputs)
         {
             if (activationfunction != null && derivativefunction == null)
                 throw new ArgumentException("derivativefunction cannot be null, if activatioin is not null");
@@ -109,7 +121,7 @@ namespace NeuralNet
             }
             else
             {
-                _neuralFunction = new NeuralFunction(NumberOfOutputs, activationfunction, derivativefunction);
+                _neuralFunction = new NeuralFunction(_combiner.NumberOfOutputs, activationfunction, derivativefunction);
             }
         }
 

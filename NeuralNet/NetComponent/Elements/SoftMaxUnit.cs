@@ -6,28 +6,27 @@ using System.Threading.Tasks;
 
 namespace NeuralNet
 {
-    // TODO: adapt to the new structure
     public class SoftMaxUnit : NetComponent
 
     {
         #region private attributes
         private int _numberOfUnits;
-
-        NetworkVector _inputs;
-        NetworkVector _outputs;
+        private NetworkVector _input;
+        protected NetworkVector _output;
         #endregion
 
         #region NetComponent overrides
         public override int NumberOfInputs { get { return _numberOfUnits; } }
         public override int NumberOfOutputs { get { return _numberOfUnits; } }
-        public override NetworkVector Output { get { return _outputs; } protected set { } }
+        public override NetworkVector Input { get { return _input; } protected set { _input = value; } }
+        public override NetworkVector Output { get { return _output; } protected set { _output = value; } }
 
         public override NetworkVector InputGradient(NetworkVector outputgradient)
         {
             if (outputgradient == null || outputgradient.Dimension != NumberOfOutputs)
                 throw new ArgumentException("outputgradient may not be null and must have dimension equal to the number of units.");
 
-            return NetworkVector.ApplyFunctionComponentWise(_outputs, outputgradient, (x, y) => x * (1 - x) * y);
+            return NetworkVector.ApplyFunctionComponentWise(Output, outputgradient, (x, y) => x * (1 - x) * y);
         }
         #endregion
 
@@ -39,8 +38,8 @@ namespace NeuralNet
                 throw new ArgumentException("Cannot make a softmax unit will fewer then one unit.");
 
             _numberOfUnits = numberofunits;
-            _inputs = new NetworkVector(_numberOfUnits);
-            _outputs = new NetworkVector(_numberOfUnits);
+            _input = new NetworkVector(numberofunits);
+            _output = new NetworkVector(numberofunits);
         }
 
         public SoftMaxUnit()
@@ -52,12 +51,13 @@ namespace NeuralNet
         {
             if (inputvalues == null || inputvalues.Dimension != _numberOfUnits)
                 throw new ArgumentException("inputvalues may not be null and must have dimension equal to the number of units.");
+            
+            Input = inputvalues;
 
-            _inputs = inputvalues;
-            _outputs = NetworkVector.ApplyFunctionComponentWise(_inputs, x => Math.Exp(x));
+            NetworkVector intermediateVector = NetworkVector.ApplyFunctionComponentWise(Input, x => Math.Exp(x));
 
-            double sum = _outputs.SumValues();
-            _outputs = NetworkVector.ApplyFunctionComponentWise(_outputs, x => x / sum);
+            double sum = intermediateVector.SumValues();
+            Output = NetworkVector.ApplyFunctionComponentWise(intermediateVector, x => x / sum);
         }
         #endregion
     }

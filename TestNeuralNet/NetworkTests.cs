@@ -152,21 +152,21 @@ namespace TestNeuralNet
             int outputneurons = 1;
             
             LinearTwoLayerTestNetwork network = new LinearTwoLayerTestNetwork(inputs, inputneurons, outputneurons);
-            List<TrainingVector> trainingVectors = new List<TrainingVector>
+            List<VectorPair> trainingVectors = new List<VectorPair>
             {
-                new TrainingVector(
+                new VectorPair(
                     new NetworkVector( new double[] { 0, 0, 0 } ),
                     new NetworkVector( new double[] { 1 })
                     ),
-                new TrainingVector(
+                new VectorPair(
                     new NetworkVector( new double[] { 1, 0, 0 } ),
                     new NetworkVector( new double[] { 0 })
                     ),
-                new TrainingVector(
+                new VectorPair(
                     new NetworkVector( new double[] { 0, 1, 0 } ),
                     new NetworkVector( new double[] { 0 })
                     ),
-                new TrainingVector(
+                new VectorPair(
                     new NetworkVector( new double[] { 1, 1, 0 } ),
                     new NetworkVector( new double[] { 1 })
                     )
@@ -195,21 +195,21 @@ namespace TestNeuralNet
             int outputneurons = 1;
 
             LinearTwoLayerTestNetwork network = new LinearTwoLayerTestNetwork(inputs, inputneurons, outputneurons);
-            List<TrainingVector> trainingVectors = new List<TrainingVector>
+            List<VectorPair> trainingVectors = new List<VectorPair>
             {
-                new TrainingVector(
+                new VectorPair(
                     new NetworkVector( new double[] { 0, 0, 0 } ),
                     new NetworkVector( new double[] { 1 })
                     ),
-                new TrainingVector(
+                new VectorPair(
                     new NetworkVector( new double[] { 1, 0, 0 } ),
                     new NetworkVector( new double[] { 0 })
                     ),
-                new TrainingVector(
+                new VectorPair(
                     new NetworkVector( new double[] { 0, 1, 0 } ),
                     new NetworkVector( new double[] { 0 })
                     ),
-                new TrainingVector(
+                new VectorPair(
                     new NetworkVector( new double[] { 1, 1, 0 } ),
                     new NetworkVector( new double[] { 1 })
                     )

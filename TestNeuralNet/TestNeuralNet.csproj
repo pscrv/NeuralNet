@@ -59,8 +59,10 @@
     <Compile Include="NeuralFunctionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SoftMaxTests.cs" />
+    <Compile Include="TestTrainingCollection.cs" />
     <Compile Include="TrainerTests.cs" />
     <Compile Include="WeightedCombinerTests.cs" />
+    <Compile Include="WeightedCombinerBankTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NeuralNet\NeuralNet.csproj">

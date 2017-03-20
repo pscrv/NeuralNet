@@ -18,8 +18,10 @@ namespace NeuralNet
             return output * (1 - output);
         }
 
-        #region private attributes
-        int _numberOfUnits;
+        #region protected attributes
+        protected int _numberOfUnits;
+        protected NetworkVector _input;
+        protected NetworkVector _output;
         protected ActivationFunction _neuralFunction;
         protected DerivativeFunction _neuralFunctionDerivative;
         #endregion
@@ -27,7 +29,8 @@ namespace NeuralNet
         #region NetworkComponent overrides
         public override int NumberOfInputs { get { return _numberOfUnits; } }
         public override int NumberOfOutputs { get { return _numberOfUnits; } }
-        public override NetworkVector Output { get; protected set; }
+        public override NetworkVector Input { get { return _input; } protected set { _input = value; } }
+        public override NetworkVector Output { get { return _output; } protected set { _output = value; } }
 
 
         public override void Run(NetworkVector inputvalues)
@@ -35,7 +38,7 @@ namespace NeuralNet
             Input = inputvalues;
             if (_neuralFunction != null)
             {
-                Output = NetworkVector.ApplyFunctionComponentWise(Input, x => _neuralFunction(x));
+                Output =  NetworkVector.ApplyFunctionComponentWise(Input, x => _neuralFunction(x));
             }
             else
             {
@@ -55,20 +58,18 @@ namespace NeuralNet
         }       
         #endregion
 
-        #region pupblic properties
-        public NetworkVector Input { get; protected set; }
+        #region public properties
         public NetworkVector Activations { get; protected set; }
         #endregion
 
         #region Constructors
-        public NeuralFunction(int numberOfUnits)
+        public NeuralFunction(int numberofunits)
         {
-            _numberOfUnits = numberOfUnits;
+            _numberOfUnits = numberofunits;
             _neuralFunction = null;
-
-            Input = new NetworkVector(numberOfUnits);
-            Activations = new NetworkVector(numberOfUnits);
-            Output = new NetworkVector(numberOfUnits);
+            _input = new NetworkVector(numberofunits);
+            _output = new NetworkVector(numberofunits);
+            Activations = new NetworkVector(numberofunits);
         }
 
         public NeuralFunction(int numberOfUnits, ActivationFunction activationfunction, DerivativeFunction derivativefunction, double[] biases = null)

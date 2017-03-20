@@ -8,10 +8,19 @@ namespace NeuralNet
 {
     public abstract class NetComponent
     {
-        public abstract int NumberOfInputs { get; }
-        public abstract int NumberOfOutputs { get; }
-        public abstract NetworkVector Output { get; protected set; }
+        #region protected fields
+        #endregion
+
+        #region abstract methods / properties
         public abstract NetworkVector InputGradient(NetworkVector outputgradient);        
         public abstract void Run(NetworkVector input);
+        public abstract int NumberOfInputs { get; }
+        public abstract int NumberOfOutputs { get; }
+        public abstract NetworkVector Input { get; protected set; }
+        public abstract NetworkVector Output { get; protected set; }
+        #endregion
+
+     
+
     }    
 }

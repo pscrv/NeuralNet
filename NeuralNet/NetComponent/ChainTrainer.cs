@@ -10,12 +10,12 @@ namespace NeuralNet
     {
         #region protected members
         protected NetComponentChain _chain;
-        protected IEnumerable<TrainingVector> _trainingData;
+        protected IEnumerable<VectorPair> _trainingData;
        // protected AdaptationStrategy _strategy;  // will need one for each trainable component
         #endregion
 
         #region constructor
-        public ChainTrainer(NetComponentChain chain, IEnumerable<TrainingVector> trainingdata)
+        public ChainTrainer(NetComponentChain chain, IEnumerable<VectorPair> trainingdata)
         {
             _chain = chain;
             _trainingData = trainingdata;
@@ -34,11 +34,11 @@ namespace NeuralNet
         }
 
 
-        protected NetworkVector _getErrorGradient(TrainingVector tv)
+        protected NetworkVector _getErrorGradient(VectorPair tv)
         {
-            _chain.Run(tv.Input);
+            _chain.Run(tv.First);
             NetworkVector gradient = _chain.Output.Copy();
-            gradient.Subtract(tv.Target);
+            gradient.Subtract(tv.Second);
             return gradient;
         }
         #endregion
