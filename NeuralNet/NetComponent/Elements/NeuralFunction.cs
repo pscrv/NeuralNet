@@ -29,7 +29,7 @@ namespace NeuralNet
         #region NetworkComponent overrides
         public override int NumberOfInputs { get { return _numberOfUnits; } }
         public override int NumberOfOutputs { get { return _numberOfUnits; } }
-        public override NetworkVector Input { get { return _input; } protected set { _input = value; } }
+        public override NetworkVector Input { get { return _input; } set { _input = value; } }
         public override NetworkVector Output { get { return _output; } protected set { _output = value; } }
 
 

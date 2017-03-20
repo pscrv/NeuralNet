@@ -11,7 +11,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void CanMakeLayerBank()
         {
-            Layer layer = new Layer(new double[,] { { 1 } });
+            Layer layer = new Layer(new NetworkMatrix( new double[,] { { 1 } }));
             LayerBank bank = new LayerBank(layer, 1);
             Assert.AreNotEqual(null, bank);
         }
@@ -24,15 +24,15 @@ namespace TestNeuralNet
             try
             {
                 LayerBank bank = new LayerBank(layer, 1);
-                Assert.Fail("Failure to throw an ArgumentException when creating a LayerBank with a null layer.");
+                Assert.Fail("Failure to throw an NullReferenceException when creating a LayerBank with a null layer.");
             }
-            catch (ArgumentException) { }
+            catch (NullReferenceException) { }
         }
 
         [TestMethod]
         public void CannotMakeZeroLayerBank()
         {
-            Layer layer = new Layer(new double[,] { { 1 } });
+            Layer layer = new Layer(new NetworkMatrix( new double[,] { { 1 } }) );
 
             try
             {
@@ -41,13 +41,12 @@ namespace TestNeuralNet
             }
             catch (ArgumentException) { }
         }
-
-
+        
         [TestMethod]
         public void LayerBankHasCorrectOutputSize()
         {
-            Layer layer1 = new Layer(new double[,] { { 1 } });
-            Layer layer2 = new Layer ( new double[,] { { 1 }, { 2 }, { 3 } } );
+            Layer layer1 = new Layer(new NetworkMatrix( new double[,] { { 1 } }) );
+            Layer layer2 = new Layer (new NetworkMatrix( new double[,] { { 1 }, { 2 }, { 3 } } ) );
 
             LayerBank bank1a = new LayerBank(layer1, 1);
             LayerBank bank1b = new LayerBank(layer1, 3);
@@ -71,7 +70,7 @@ namespace TestNeuralNet
         public void UnRunLayerBankHasZeroOutput()
         {
             int numberOfBanks = 3;
-            Layer layer = new Layer(new double[,] { { 1 } });
+            Layer layer = new Layer(new NetworkMatrix( new double[,] { { 1 } }) );
             LayerBank bank = new LayerBank(layer, numberOfBanks);
             NetworkVector outputcheck = new NetworkVector(numberOfBanks);
             Assert.AreEqual(outputcheck, bank.Output);
@@ -81,7 +80,7 @@ namespace TestNeuralNet
         public void CanRunLayerBank()
         {
             int numberOfBanks = 3;
-            Layer layer = new Layer(new double[,] { { 1 } });
+            Layer layer = new Layer(new NetworkMatrix( new double[,] { { 1 } }) );
             LayerBank bank = new LayerBank(layer, numberOfBanks);
             NetworkVector zeroVector = new NetworkVector(numberOfBanks);
 
@@ -89,12 +88,11 @@ namespace TestNeuralNet
             Assert.AreEqual(zeroVector, bank.Output);
         }
 
-
         [TestMethod]
         public void CannotRunLayerBankWithBadInputSize()
         {
             int numberOfBanks = 3;
-            Layer layer = new Layer(new double[,] { { 1 } });
+            Layer layer = new Layer(new NetworkMatrix( new double[,] { { 1 } }) );
             LayerBank bank = new LayerBank(layer, numberOfBanks);
             NetworkVector badInput = new NetworkVector(2);
 
@@ -110,7 +108,7 @@ namespace TestNeuralNet
         public void CorrectRunOneInput()
         {
             int numberOfBanks = 3;
-            Layer layer = new Layer(new double[,] { { 1 } });
+            Layer layer = new Layer(new NetworkMatrix( new double[,] { { 1 } }) );
             LayerBank bank = new LayerBank(layer, numberOfBanks);
             NetworkVector input = new NetworkVector(new double[] { 2, 3, 5 });
             NetworkVector outputcheck = new NetworkVector(new double[] { 2, 3, 5 });
@@ -123,7 +121,7 @@ namespace TestNeuralNet
         public void CorrectRunThreeInputs()
         {
             int numberOfBanks = 3;
-            Layer layer = new Layer(new double[,] { { 2, 3, 5 } });
+            Layer layer = new Layer(new NetworkMatrix( new double[,] { { 2, 3, 5 } }) );
             LayerBank bank = new LayerBank(layer, numberOfBanks);
             NetworkVector input = new NetworkVector(new double[] { 7, 7, 7, 11, 11, 11, 13, 13, 13 });
             NetworkVector outputcheck = new NetworkVector(new double[] { 70, 110, 130 });
@@ -133,22 +131,21 @@ namespace TestNeuralNet
         }
 
         [TestMethod]
-        public void CanBackPropagateLayerBank()
+        public void InputGradient()
         {
             int numberOfBanks = 3;
-            Layer layer = new Layer(new double[,] { { 1 } });
+            Layer layer = new Layer(new NetworkMatrix( new double[,] { { 1 } }) );
             LayerBank bank = new LayerBank(layer, numberOfBanks);
             NetworkVector zeroVector = new NetworkVector(numberOfBanks);
-
-            bank.BackPropagate(zeroVector);
-            Assert.AreEqual(zeroVector, bank.InputGradient);
+            
+            Assert.AreEqual(zeroVector, bank.InputGradient(zeroVector));
         }
 
         [TestMethod]
         public void CannotBackPropagateLayerBankWithBadOutputGradientSize()
         {
             int numberOfBanks = 3;
-            Layer layer = new Layer(new double[,] { { 1 } });
+            Layer layer = new Layer(new NetworkMatrix( new double[,] { { 1 } }) );
             LayerBank bank = new LayerBank(layer, numberOfBanks);
             NetworkVector badGradient = new NetworkVector(2);
 
@@ -160,32 +157,42 @@ namespace TestNeuralNet
             catch (ArgumentException) { }
         }
 
-        //[TestMethod]
-        //public void CorrectBackPropagattionOneInput()
-        //{
-        //    int numberOfBanks = 3;
-        //    Layer layer = new Layer(new double[,] { { 1 } });
-        //    LayerBank bank = new LayerBank(layer, numberOfBanks);
-        //    NetworkVector input = new NetworkVector(new double[] { 2, 3, 5 });
-        //    NetworkVector outputGradients = new NetworkVector(new double[] { 2, 3, 5 });
-        //    NetworkVector inputGradientCheck = new NetworkVector(new double[] { 2, 3, 5 });
+        [TestMethod]
+        public void CorrectInputGradientOneInput()
+        {
+            int numberOfBanks = 3;
+            Layer layer = new Layer(new NetworkMatrix( new double[,] { { 1 } }) );
+            LayerBank bank = new LayerBank(layer, numberOfBanks);
+            NetworkVector input = new NetworkVector(new double[] { 2, 3, 5 });
+            NetworkVector outputGradient = new NetworkVector(new double[] { 2, 3, 5 });
+            NetworkVector inputGradientCheck = new NetworkVector(new double[] { 2, 3, 5 });
+            
+            Assert.AreEqual(inputGradientCheck, bank.InputGradient(outputGradient));
+        }
 
-        //    bank.Run(input);
-        //    bank.BackPropagate(outputGradients);
-        //    Assert.AreEqual(inputGradientCheck, bank.InputGradient);
-        //}
+        [TestMethod]
+        public void BackPropagateIsCorrect()
+        {
+            int numberOfBanks = 3;
+            Layer layer = new Layer(new NetworkMatrix(new double[,] { { 1 } }));
+            LayerBank bank = new LayerBank(layer, numberOfBanks);
+            NetworkVector inputVector = new NetworkVector(new double[] { 1, 2, 3 });
+            NetworkVector bpVector = new NetworkVector(new double[] { 5, 7, 11 });
 
-        //[TestMethod]
-        //public void CorrectRunThreeInputs()
-        //{
-        //    int numberOfBanks = 3;
-        //    Layer layer = new Layer(new double[,] { { 2, 3, 5 } });
-        //    LayerBank bank = new LayerBank(layer, numberOfBanks);
-        //    NetworkVector input = new NetworkVector(new double[] { 7, 7, 7, 11, 11, 11, 13, 13, 13 });
-        //    NetworkVector outputcheck = new NetworkVector(new double[] { 70, 110, 130 });
+            bank.Run(inputVector);
+            NetworkVector inputGradientCheck = new NetworkVector(new double[] { 5, 7, 11 });
+            Assert.AreEqual(inputGradientCheck, bank.InputGradient(bpVector));
 
-        //    bank.Run(input);
-        //    Assert.AreEqual(outputcheck, bank.Output);
-        //}
+
+            bank.BackPropagate(bpVector);
+            bank.Update(new GradientDescent());
+
+            NetworkMatrix weightsCheck = new NetworkMatrix(new double[,] { { -51 } });
+            NetworkVector biasCheck = new NetworkVector(new double[] { -23 });
+
+            Assert.AreEqual(biasCheck, bank.Biases);
+            Assert.AreEqual(weightsCheck, bank.Weights);
+        }
+
     }
 }

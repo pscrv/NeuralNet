@@ -63,6 +63,7 @@
     <Compile Include="TrainerTests.cs" />
     <Compile Include="WeightedCombinerTests.cs" />
     <Compile Include="WeightedCombinerBankTests.cs" />
+    <Compile Include="LayerBankTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NeuralNet\NeuralNet.csproj">

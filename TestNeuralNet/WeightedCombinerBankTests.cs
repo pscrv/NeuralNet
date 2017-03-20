@@ -145,6 +145,19 @@ namespace TestNeuralNet
         }
 
         [TestMethod]
+        public void CorrectInputGradientOneInput()
+        {
+            int numberOfBanks = 3;
+            WeightedCombiner layer = new WeightedCombiner(new NetworkMatrix( new double[,] { { 1 } } ));
+            WeightedCombinerBank bank = new WeightedCombinerBank(layer, numberOfBanks);
+            NetworkVector input = new NetworkVector(new double[] { 2, 3, 5 });
+            NetworkVector outputGradient = new NetworkVector(new double[] { 2, 3, 5 });
+            NetworkVector inputGradientCheck = new NetworkVector(new double[] { 2, 3, 5 });
+            
+            Assert.AreEqual(inputGradientCheck, bank.InputGradient(outputGradient));
+        }
+
+        [TestMethod]
         public void BackPropagateWeightedCombinerBankIsCorrect2()
         {
             int numberOfBanks = 3;
@@ -188,8 +201,7 @@ namespace TestNeuralNet
             NetworkVector biasCheck = new NetworkVector( new double[] { -23 } );
 
             Assert.AreEqual(biasCheck, bank.Biases);
-            Assert.AreEqual(weightsCheck, bank.Weights);
-            
+            Assert.AreEqual(weightsCheck, bank.Weights);            
         }
 
         [TestMethod]
@@ -207,33 +219,5 @@ namespace TestNeuralNet
             }
             catch (ArgumentException) { }
         }
-
-        //[TestMethod]
-        //public void CorrectBackPropagattionOneInput()
-        //{
-        //    int numberOfBanks = 3;
-        //    WeightedCombiner layer = new WeightedCombiner(new double[,] { { 1 } });
-        //    WeightedCombinerBank bank = new WeightedCombinerBank(layer, numberOfBanks);
-        //    NetworkVector input = new NetworkVector(new double[] { 2, 3, 5 });
-        //    NetworkVector outputGradients = new NetworkVector(new double[] { 2, 3, 5 });
-        //    NetworkVector inputGradientCheck = new NetworkVector(new double[] { 2, 3, 5 });
-
-        //    bank.Run(input);
-        //    bank.BackPropagate(outputGradients);
-        //    Assert.AreEqual(inputGradientCheck, bank.InputGradient);
-        //}
-
-        //[TestMethod]
-        //public void CorrectRunThreeInputs()
-        //{
-        //    int numberOfBanks = 3;
-        //    WeightedCombiner layer = new WeightedCombiner(new double[,] { { 2, 3, 5 } });
-        //    WeightedCombinerBank bank = new WeightedCombinerBank(layer, numberOfBanks);
-        //    NetworkVector input = new NetworkVector(new double[] { 7, 7, 7, 11, 11, 11, 13, 13, 13 });
-        //    NetworkVector outputcheck = new NetworkVector(new double[] { 70, 110, 130 });
-
-        //    bank.Run(input);
-        //    Assert.AreEqual(outputcheck, bank.Output);
-        //}
     }
 }

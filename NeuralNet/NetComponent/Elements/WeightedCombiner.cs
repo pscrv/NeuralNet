@@ -10,7 +10,7 @@ namespace NeuralNet
         public override int NumberOfInputs { get { return Weights.NumberOfInputs; } }
         public override int NumberOfOutputs { get { return Weights.NumberOfOutputs; } }
         
-        public override NetworkVector Input { get { return _input; } protected set { _input = value; } }
+        public override NetworkVector Input { get { return _input; } set { _input = value; } }
         public override NetworkVector Output { get { return _output; } protected set { _output = value; } }
 
         public override void Run(NetworkVector inputvalues)

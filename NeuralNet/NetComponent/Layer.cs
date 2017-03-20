@@ -38,7 +38,7 @@ namespace NeuralNet
         #region NetComponent overrides
         public override int NumberOfInputs { get { return _combiner.NumberOfInputs; } }
         public override int NumberOfOutputs { get { return _combiner.NumberOfOutputs; } }
-        public override NetworkVector Input { get { return _combiner.Input; } protected set { } }
+        public override NetworkVector Input { get { return _combiner.Input; } set { _combiner.Input = value; } }
         public override NetworkVector Output { 
             get
             {
@@ -53,7 +53,7 @@ namespace NeuralNet
 
         public override NetworkVector InputGradient(NetworkVector outputgradient)
         {
-            return _combiner.InputGradient(_getActivationGradient(outputgradient));
+            return _combiner.InputGradient(ActivationGradient(outputgradient));
         }
         
         public override void Run(NetworkVector inputvalues)
@@ -73,14 +73,13 @@ namespace NeuralNet
 
         public override NetworkVector BiasesGradient(NetworkVector outputgradient)
         {
-            return _combiner.BiasesGradient(_getActivationGradient(outputgradient));
+            return _combiner.BiasesGradient(ActivationGradient(outputgradient));
         }
 
         public override NetworkMatrix WeightsGradient(NetworkVector outputgradient)
         {
-            return _combiner.WeightsGradient(_getActivationGradient(outputgradient));
-        }
-      
+            return _combiner.WeightsGradient(ActivationGradient(outputgradient));
+        }      
 
         public override void Update(AdaptationStrategy strategy)
         {
@@ -135,8 +134,8 @@ namespace NeuralNet
         #endregion
 
 
-        #region private methods
-        private NetworkVector _getActivationGradient(NetworkVector outputgradient)
+        #region public methods
+        public NetworkVector ActivationGradient(NetworkVector outputgradient)
         {
             if (_neuralFunction == null)
                 return outputgradient;

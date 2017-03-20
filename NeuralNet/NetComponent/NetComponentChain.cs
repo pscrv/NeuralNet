@@ -39,7 +39,7 @@ namespace NeuralNet
         #region NetComponent overrides
         public override int NumberOfInputs { get { return _head.Component.NumberOfInputs; } }
         public override int NumberOfOutputs { get { return _tail.Component.NumberOfOutputs; } }
-        public override NetworkVector Input { get { return _head.Component.Input; } protected set { } }
+        public override NetworkVector Input { get { return _head.Component.Input; } set { } }
         public override NetworkVector Output { get { return _tail.Component.Output; } protected set { } }
 
         public override NetworkVector InputGradient(NetworkVector outputgradient)
@@ -146,15 +146,15 @@ namespace NeuralNet
         public void BackPropagate(NetworkVector outputgradient)
         {
             NetworkVector currentGradient = outputgradient.Copy();
-            TrainableComponent currentComponent;
+            NetComponent currentComponent;
             _networkComponentNode node = _tail;
             {
                 while (node != null)
                 {
-                    currentComponent = node.Component as TrainableComponent;
+                    currentComponent = node.Component;
                     if (node.IsTrainable)
                     {
-                        currentComponent.BackPropagate(currentGradient);
+                        (currentComponent as TrainableComponent).BackPropagate(currentGradient);
                     }
 
                     currentGradient = currentComponent.InputGradient(currentGradient);
