@@ -32,4 +32,57 @@ namespace NeuralNet
             return result;
         }
     }
+
+    public class CrossEntropy : CostFunction
+    {
+        public override double Cost(NetworkVector target, NetworkVector vector)
+        {
+            return
+                NetworkVector.ApplyFunctionComponentWise(
+                    target,
+                    vector,
+                    (x, y) => Math.Log(y) * x
+                    ).SumValues() / vector.Dimension;
+        }
+
+        public override NetworkVector Gradient(NetworkVector target, NetworkVector vector)
+        {
+            return NetworkVector.ApplyFunctionComponentWise(
+                target,
+                vector,
+                (x, y) => 1 / y
+                );
+        }
+    }
+
+    public class SoftMaxWithCrossEntropy : CostFunction
+    {
+        private NetworkVector _workingVector;
+        private double _sum;
+
+        public override double Cost(NetworkVector target, NetworkVector vector)
+        {            
+            _workingVector = NetworkVector.ApplyFunctionComponentWise(vector, x => Math.Exp(x));
+            _sum = _workingVector.SumValues();
+            _workingVector = NetworkVector.ApplyFunctionComponentWise(_workingVector, x => x / _sum);
+
+
+            return
+                NetworkVector.ApplyFunctionComponentWise(
+                    target,
+                    _workingVector,
+                    (x, y) => Math.Log(y) * x
+                    ).SumValues() / vector.Dimension;
+        }
+
+        public override NetworkVector Gradient(NetworkVector target, NetworkVector vector)
+        {
+            return NetworkVector.ApplyFunctionComponentWise(
+                target,
+                vector,
+                (x, y) => x - y
+                );
+        }
+    }
 }
+    

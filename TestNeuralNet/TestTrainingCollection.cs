@@ -21,6 +21,27 @@ namespace TestNeuralNet
         }
 
         [TestMethod]
+        public void CanIterate()
+        {
+            TrainingCollection tc = new TrainingCollection();
+            tc.Add(new VectorPair(
+                new NetworkVector(1),
+                new NetworkVector(2)
+                ));
+            tc.Add(new VectorPair(
+                new NetworkVector(1),
+                new NetworkVector(2)
+                ));
+            int count = 0;
+            foreach (VectorPair pair in tc)
+            {
+                count++;
+            }
+            Assert.IsNotNull(tc);
+            Assert.AreEqual(count, tc.Count);
+        }
+
+        [TestMethod]
         public void CanMakeGetAsSingletons()
         {
             TrainingCollection tc = new TrainingCollection();

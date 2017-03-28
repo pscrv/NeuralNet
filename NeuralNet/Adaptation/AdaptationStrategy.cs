@@ -8,34 +8,36 @@ namespace NeuralNet
 {
     public abstract class AdaptationStrategy
     {
-        public abstract NetworkMatrix WeightsUpdate(NetworkMatrix gradient);
+        public abstract WeightsMatrix WeightsUpdate(WeightsMatrix gradient);
         public abstract NetworkVector BiasesUpdate(NetworkVector gradient);
     }
 
 
     public class GradientDescent : AdaptationStrategy
     {
-        private double _stepSize; 
+        private double _stepSize;
+        private int _batchSize;
 
-        public GradientDescent(double stepsize)
+        public GradientDescent(double stepsize, int batchsize)
         {
             _stepSize = stepsize;
+            _batchSize = batchsize;
         }
 
-        public GradientDescent() : this(stepsize: 1.0) { }
+        public GradientDescent() : this(stepsize: 1.0, batchsize: 1) { }
 
         #region AdaptationStrategy overrides
         public override NetworkVector BiasesUpdate(NetworkVector gradient)
         {
             NetworkVector result = gradient.Copy();
-            result.MultiplyBy(-_stepSize);
+            result.MultiplyBy(-_stepSize / _batchSize);
             return result;
         }
 
-        public override NetworkMatrix WeightsUpdate(NetworkMatrix gradient)
+        public override WeightsMatrix WeightsUpdate(WeightsMatrix gradient)
         {
-            NetworkMatrix result = gradient.Copy();
-            result.MultiplyBy(-_stepSize);
+            WeightsMatrix result = gradient.Copy();
+            result.MultiplyBy(-_stepSize / _batchSize);
             return result;
         }
         #endregion

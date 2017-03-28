@@ -31,11 +31,11 @@ namespace NeuralNet
 
         #region public properties
         public override NetworkVector Biases { get; }
-        public override NetworkMatrix Weights { get; }
+        public override WeightsMatrix Weights { get; }
         #endregion
 
         #region Constructors
-        public WeightedCombiner(NetworkMatrix weights, NetworkVector biases)
+        public WeightedCombiner(WeightsMatrix weights, NetworkVector biases)
             : base (weights.NumberOfOutputs, weights.NumberOfInputs)
         {
             if (weights == null)
@@ -53,7 +53,7 @@ namespace NeuralNet
             _output = new NetworkVector(weights.NumberOfOutputs);
         }
         
-        public WeightedCombiner(NetworkMatrix weights)
+        public WeightedCombiner(WeightsMatrix weights)
             : this(weights, new NetworkVector(weights.NumberOfOutputs)) { }
         
         
@@ -72,7 +72,7 @@ namespace NeuralNet
             return outputgradient.Copy();
         }
 
-        public override NetworkMatrix WeightsGradient(NetworkVector outputgradient)
+        public override WeightsMatrix WeightsGradient(NetworkVector outputgradient)
         {
             return outputgradient.LeftMultiply(Input);
         }

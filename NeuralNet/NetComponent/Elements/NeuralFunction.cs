@@ -10,7 +10,7 @@ namespace NeuralNet
     {
         public static double __Logistic(double input)
         {
-            return 1.0 / (1 + Math.Exp(-input));
+            return 1.0 / (1.0 + Math.Exp(-input));
         }
 
         public static double __LogisticDerivative(double input, double output)

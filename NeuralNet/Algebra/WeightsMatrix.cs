@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NeuralNet
 {
-    public class NetworkMatrix
+    public class WeightsMatrix
     {
         #region private attributes
         private double[,] _matrix;
@@ -19,12 +19,12 @@ namespace NeuralNet
 
 
         #region constructors
-        public NetworkMatrix(double[,] matrix)
+        public WeightsMatrix(double[,] matrix)
         {
             _matrix = (double[,])matrix.Clone();
         }
 
-        public NetworkMatrix(int neurons, int inputs)
+        public WeightsMatrix(int neurons, int inputs)
         {
             _matrix = new double[neurons, inputs];
         }
@@ -39,7 +39,7 @@ namespace NeuralNet
                     _matrix[i, j] *= factor;
         }
 
-        public void Add(NetworkMatrix other)
+        public void Add(WeightsMatrix other)
         {
             for (int i = 0; i < NumberOfOutputs; i++)
             {
@@ -50,7 +50,7 @@ namespace NeuralNet
             }
         }
 
-        public void Subtract(NetworkMatrix other)
+        public void Subtract(WeightsMatrix other)
         {
             for (int i = 0; i < NumberOfOutputs; i++)
             {
@@ -99,9 +99,9 @@ namespace NeuralNet
             return new NetworkVector(result);
         }
 
-        public NetworkMatrix Copy()
+        public WeightsMatrix Copy()
         {
-            return new NetworkMatrix(_matrix.Clone() as double[,]);
+            return new WeightsMatrix(_matrix.Clone() as double[,]);
         }
 
         public double[,] ToArray()
@@ -135,10 +135,10 @@ namespace NeuralNet
             if (other.GetType() != this.GetType())
                 return false;
 
-            return this.Equals(other as NetworkMatrix);
+            return this.Equals(other as WeightsMatrix);
         }
 
-        public bool Equals(NetworkMatrix other)
+        public bool Equals(WeightsMatrix other)
         {
             if (other == null)
                 return false;

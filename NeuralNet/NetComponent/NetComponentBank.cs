@@ -39,16 +39,16 @@ namespace NeuralNet
 
         #region TrainableComponent overrides
         public override NetworkVector Biases { get { return _component.Biases; } }
-        public override NetworkMatrix Weights { get { return _component.Weights; } }
+        public override WeightsMatrix Weights { get { return _component.Weights; } }
 
         public override NetworkVector BiasesGradient(NetworkVector outputgradient)
         {
             return NetworkVector.Sum(_segment(outputgradient));
         }
 
-        public override NetworkMatrix WeightsGradient(NetworkVector outputgradient)
+        public override WeightsMatrix WeightsGradient(NetworkVector outputgradient)
         {
-            NetworkMatrix weightsGradient = new NetworkMatrix(Weights.NumberOfOutputs, Weights.NumberOfInputs);
+            WeightsMatrix weightsGradient = new WeightsMatrix(Weights.NumberOfOutputs, Weights.NumberOfInputs);
             foreach (var pair in _segmentAndPair(_input, outputgradient))
             {
                 weightsGradient.Add(pair.Second.LeftMultiply(pair.First));

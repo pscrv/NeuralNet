@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using NeuralNet;
+using System;
 using System.Collections.Generic;
 
 namespace TestNeuralNet
@@ -12,6 +13,15 @@ namespace TestNeuralNet
         public void CanMakeAndReadZeroNetworkVector()
         {
             NetworkVector vector = new NetworkVector(2);
+            Assert.AreEqual(0.0, vector.ToArray()[0]);
+            Assert.AreEqual(0.0, vector.ToArray()[1]);
+        }
+
+        [TestMethod]
+        public void CanZeroNetworkVector()
+        {
+            NetworkVector vector = new NetworkVector(new double[] { 1, 2 });
+            vector.Zero();
             Assert.AreEqual(0.0, vector.ToArray()[0]);
             Assert.AreEqual(0.0, vector.ToArray()[1]);
         }
@@ -29,7 +39,7 @@ namespace TestNeuralNet
             Assert.IsFalse(vector1.Equals(vector3));
             Assert.IsFalse(vector3.Equals(vector1));
             Assert.IsFalse(vector1.Equals(null));
-            Assert.IsFalse(vector1.Equals(new NetworkMatrix(3, 5)));
+            Assert.IsFalse(vector1.Equals(new WeightsMatrix(3, 5)));
         }
 
         [TestMethod]
@@ -128,7 +138,7 @@ namespace TestNeuralNet
         {
             NetworkVector vector1 = new NetworkVector(new double[] { 1, 0 });
             NetworkVector vector2 = new NetworkVector(new double[] { 0, 1 });
-            NetworkMatrix product = vector1.LeftMultiply(vector2);
+            WeightsMatrix product = vector1.LeftMultiply(vector2);
             double[,] productValues = product.ToArray();
             Assert.AreEqual(0, productValues[0, 0]);
             Assert.AreEqual(1, productValues[0, 1]);
@@ -158,7 +168,7 @@ namespace TestNeuralNet
         {
             int neuronCount = 2;
             int inputcount = 3;
-            NetworkMatrix matrix = new NetworkMatrix(neuronCount, inputcount);
+            WeightsMatrix matrix = new WeightsMatrix(neuronCount, inputcount);
 
             double[,] matrixValues = matrix.ToArray();
             Assert.AreEqual(neuronCount, matrix.NumberOfOutputs);
@@ -173,7 +183,7 @@ namespace TestNeuralNet
         {
             int neuronCount = 2;
             int inputcount = 3;
-            NetworkMatrix matrix = new NetworkMatrix(new double[,]{ {0, 1, 2 }, { 1, 2, 3} });
+            WeightsMatrix matrix = new WeightsMatrix(new double[,]{ {0, 1, 2 }, { 1, 2, 3} });
 
             double[,] matrixValues = matrix.ToArray();
             Assert.AreEqual(neuronCount, matrix.NumberOfOutputs);
@@ -188,7 +198,7 @@ namespace TestNeuralNet
         {
             int neuronCount = 2;
             int inputcount = 3;
-            NetworkMatrix matrix = new NetworkMatrix(new double[,] { { 0, 1, 2 }, { 1, 2, 3 } });
+            WeightsMatrix matrix = new WeightsMatrix(new double[,] { { 0, 1, 2 }, { 1, 2, 3 } });
             matrix.Subtract(matrix);
 
             double[,] matrixValues = matrix.ToArray();
@@ -200,7 +210,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void CanLeftMultiply()
         {
-            NetworkMatrix matrix = new NetworkMatrix(new double[,] { { 0, 1 }, { 1, 0 } });
+            WeightsMatrix matrix = new WeightsMatrix(new double[,] { { 0, 1 }, { 1, 0 } });
             NetworkVector vector = new NetworkVector(new double[] { 1, 1 });
             NetworkVector result = matrix.LeftMultiply(vector);
 
@@ -212,7 +222,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void CanDotWithWeightsPerInput()
         {
-            NetworkMatrix matrix = new NetworkMatrix(new double[,] { { 0, 1 }, { 1, 0 } });
+            WeightsMatrix matrix = new WeightsMatrix(new double[,] { { 0, 1 }, { 1, 0 } });
             NetworkVector vector = new NetworkVector(new double[] { 1, 0 });
             NetworkVector result = matrix.DotWithWeightsPerInput(vector);
 

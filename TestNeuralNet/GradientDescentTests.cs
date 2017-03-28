@@ -26,7 +26,7 @@ namespace TestNeuralNet
         {
             try
             {
-                GradientDescent gd = new GradientDescent(0.5);
+                GradientDescent gd = new GradientDescent(0.5, 1);
             }
             catch (Exception e)
             {
@@ -37,7 +37,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void CanGetBiasesUpdate()
         {
-            GradientDescent gd = new GradientDescent(0.5);
+            GradientDescent gd = new GradientDescent(0.5, 1);
             NetworkVector testVector = new NetworkVector(new double[] { 1, 2, 3 });
             NetworkVector result = gd.BiasesUpdate(testVector);
             NetworkVector resultCheck = new NetworkVector(new double[] { -0.5, -1.0, -1.5 });
@@ -48,10 +48,10 @@ namespace TestNeuralNet
         [TestMethod]
         public void CanGetWeightsUpdate()
         {
-            GradientDescent gd = new GradientDescent(0.5);
-            NetworkMatrix testMatrix = new NetworkMatrix(new double[,] { { 1, 2, 3 }, { 2, 3, 4 } });
-            NetworkMatrix result = gd.WeightsUpdate(testMatrix);
-            NetworkMatrix resultCheck = new NetworkMatrix(new double[,] { { -0.5, -1.0, -1.5 }, { -1.0, -1.5, -2.0 } });
+            GradientDescent gd = new GradientDescent(0.5, 1);
+            WeightsMatrix testMatrix = new WeightsMatrix(new double[,] { { 1, 2, 3 }, { 2, 3, 4 } });
+            WeightsMatrix result = gd.WeightsUpdate(testMatrix);
+            WeightsMatrix resultCheck = new WeightsMatrix(new double[,] { { -0.5, -1.0, -1.5 }, { -1.0, -1.5, -2.0 } });
 
             Assert.AreEqual(resultCheck, result);
         }

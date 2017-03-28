@@ -16,19 +16,19 @@ namespace NeuralNet
         #endregion
 
         #region protected fields
-        protected NetworkMatrix _weightsGradientAccumulator;
+        protected WeightsMatrix _weightsGradientAccumulator;
         protected NetworkVector _biasesGradientAccumulator;
         #endregion
 
         #region public properties
-        public abstract NetworkMatrix Weights { get; }
+        public abstract WeightsMatrix Weights { get; }
         public abstract NetworkVector Biases { get; }        
         #endregion
 
         #region constructors
         public TrainableComponent(int numberofoutputs, int numberofinputs)
         {
-            _weightsGradientAccumulator = new NetworkMatrix(numberofoutputs, numberofinputs);
+            _weightsGradientAccumulator = new WeightsMatrix(numberofoutputs, numberofinputs);
             _biasesGradientAccumulator = new NetworkVector(numberofoutputs);
         }
         #endregion
@@ -36,7 +36,7 @@ namespace NeuralNet
 
         #region public methods
         public abstract NetworkVector BiasesGradient(NetworkVector outputgradient);
-        public abstract NetworkMatrix WeightsGradient(NetworkVector outputgradient);        
+        public abstract WeightsMatrix WeightsGradient(NetworkVector outputgradient);        
         #endregion
     }
 }

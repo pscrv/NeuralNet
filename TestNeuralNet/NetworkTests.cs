@@ -175,9 +175,9 @@ namespace TestNeuralNet
             NetworkTrainer trainer = new OnlineNetworkTrainer(network, trainingVectors);
             trainer.Train();
 
-            NetworkMatrix inputWeightsCheck = new NetworkMatrix(new double[,] { { -35499715, -35499260, 1 },{ -35499715, -35499260, 1 }});
+            WeightsMatrix inputWeightsCheck = new WeightsMatrix(new double[,] { { -35499715, -35499260, 1 },{ -35499715, -35499260, 1 }});
             NetworkVector inputBiasesCheck = new NetworkVector(new double[] { -35499265, -35499265 });
-            NetworkMatrix outputWeightsCheck = new NetworkMatrix(new double[,] { { -224831362, -224831362 } });
+            WeightsMatrix outputWeightsCheck = new WeightsMatrix(new double[,] { { -224831362, -224831362 } });
             NetworkVector outputBiasesCheck = new NetworkVector(new double[] {-251825});
 
             Assert.AreEqual(inputWeightsCheck, network.InputLayer.Weights);
@@ -218,9 +218,9 @@ namespace TestNeuralNet
             NetworkTrainer trainer = new BatchNetworkTrainer(network, trainingVectors);
             trainer.Train();
 
-            NetworkMatrix inputWeightsCheck = new NetworkMatrix(new double[,] { { -4, -4, 1 }, { -4, -4, 1 } });
+            WeightsMatrix inputWeightsCheck = new WeightsMatrix(new double[,] { { -4, -4, 1 }, { -4, -4, 1 } });
             NetworkVector inputBiasesCheck = new NetworkVector(new double[] { -6, -6 });
-            NetworkMatrix outputWeightsCheck = new NetworkMatrix(new double[,] { { -9, -9 } });
+            WeightsMatrix outputWeightsCheck = new WeightsMatrix(new double[,] { { -9, -9 } });
             NetworkVector outputBiasesCheck = new NetworkVector(new double[] { -6 });
 
             Assert.AreEqual(inputWeightsCheck, network.InputLayer.Weights);

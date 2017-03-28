@@ -47,6 +47,9 @@ namespace NeuralNet
         #endregion
 
         #region public methods
+        // Should subtract max input from all inputs
+        // Subraction of a constant does not affect the output
+        // but it will affect the exponential  - keep the oututs smallish.
         public override void Run(NetworkVector inputvalues)
         {
             if (inputvalues == null || inputvalues.Dimension != _numberOfUnits)

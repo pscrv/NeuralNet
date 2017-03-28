@@ -27,8 +27,8 @@ namespace NeuralNet
 
 
 
-            InputLayer = Layer.CreateLinearLayer(new NetworkMatrix(inputWeights), new NetworkVector(inputneurons));
-            OutputLayer = Layer.CreateLinearLayer(new NetworkMatrix(outputWeights), new NetworkVector(outputneurons));
+            InputLayer = Layer.CreateLinearLayer(new WeightsMatrix(inputWeights), new NetworkVector(inputneurons));
+            OutputLayer = Layer.CreateLinearLayer(new WeightsMatrix(outputWeights), new NetworkVector(outputneurons));
             
             this.AddTrainable(InputLayer);
             this.AddTrainable(OutputLayer);

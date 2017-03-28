@@ -12,6 +12,11 @@ namespace NeuralNet
         protected ITrainable _component;
         protected AdaptationStrategy _strategy;
         protected CostFunction _costFunction;
+        protected double _costAccumulator;
+        #endregion
+
+        #region public properties
+        public double Cost { get { return _costAccumulator; } }
         #endregion
 
         #region constructor
@@ -20,27 +25,52 @@ namespace NeuralNet
             _component = component;
             _costFunction = cf;
             _strategy = strategy;
+            _costAccumulator = 0;
         }
         #endregion
 
         public void Train(TrainingCollection trainingdata)
         {
-            NetworkVector errorGradient;
+
+            _costAccumulator = 0;
             foreach (VectorPair tv in trainingdata)
             {
-                errorGradient = _getErrorGradient(tv);
-                _component.BackPropagate(errorGradient);
+                _runAndBackPropagate(tv);
+                //errorGradient = _getErrorGradient(tv);
+                //_component.BackPropagate(errorGradient);
             }
             _component.Update(_strategy);
         }
-        
+
+        public void ParallelTrain(TrainingCollection trainingdata)
+        {
+
+            _costAccumulator = 0;
+            Parallel.ForEach(
+                trainingdata, 
+                tv =>
+                {
+                    _runAndBackPropagate(tv);
+                    //errorGradient = _getErrorGradient(tv);
+                    //_component.BackPropagate(errorGradient);
+                }
+                );
+            _component.Update(_strategy);
+        }
+
         #region protected methods
 
         protected NetworkVector _getErrorGradient(VectorPair tv)
         {
             _component.Run(tv.First);
-            NetworkVector output = _component.Output.Copy();
-            return _costFunction.Gradient(tv.Second, output);
+            return _costFunction.Gradient(tv.Second, _component.Output);
+        }
+
+        protected void _runAndBackPropagate(VectorPair tv)
+        {
+            _component.Run(tv.First);
+            _costAccumulator += _costFunction.Cost(tv.Second, _component.Output);
+            _component.BackPropagate(_costFunction.Gradient(tv.Second, _component.Output));
         }
         #endregion
     }

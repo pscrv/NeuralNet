@@ -19,7 +19,7 @@ namespace NeuralNet
         {
             _network = network;
             _trainingData = trainingdata;
-            _strategy = new GradientDescent(1.0);
+            _strategy = new GradientDescent(1.0, 1);
         }
         #endregion
         

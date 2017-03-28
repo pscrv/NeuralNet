@@ -6,23 +6,23 @@ namespace NeuralNet
     public class Layer : TrainableComponent
     {
         #region static
-        public static Layer CreateLinearLayer(NetworkMatrix weights, NetworkVector biases)
+        public static Layer CreateLinearLayer(WeightsMatrix weights, NetworkVector biases)
         {
             return new Layer(weights, biases, null, null);
         }
 
-        public static Layer CreateLinearLayer(NetworkMatrix weights)
+        public static Layer CreateLinearLayer(WeightsMatrix weights)
         {
             return new Layer(weights, new NetworkVector(weights.NumberOfOutputs), null, null);
         }
 
 
-        public static Layer CreateLogisticLayer(NetworkMatrix weights, NetworkVector biases)
+        public static Layer CreateLogisticLayer(WeightsMatrix weights, NetworkVector biases)
         {
             return new Layer(weights, biases, NeuralFunction.__Logistic, NeuralFunction.__LogisticDerivative);
         }
 
-        public static Layer CreateLogisticLayer(NetworkMatrix weights)
+        public static Layer CreateLogisticLayer(WeightsMatrix weights)
         {
             return new Layer(weights, new NetworkVector(weights.NumberOfOutputs), NeuralFunction.__Logistic, NeuralFunction.__LogisticDerivative);
         }
@@ -68,7 +68,7 @@ namespace NeuralNet
         #endregion
 
         #region TrainableComponent overrides
-        public override NetworkMatrix Weights { get { return _combiner.Weights; } }
+        public override WeightsMatrix Weights { get { return _combiner.Weights; } }
         public override NetworkVector Biases { get { return _combiner.Biases; } }
 
         public override NetworkVector BiasesGradient(NetworkVector outputgradient)
@@ -76,7 +76,7 @@ namespace NeuralNet
             return _combiner.BiasesGradient(ActivationGradient(outputgradient));
         }
 
-        public override NetworkMatrix WeightsGradient(NetworkVector outputgradient)
+        public override WeightsMatrix WeightsGradient(NetworkVector outputgradient)
         {
             return _combiner.WeightsGradient(ActivationGradient(outputgradient));
         }      
@@ -99,7 +99,7 @@ namespace NeuralNet
 
         #region constructors
         public Layer (
-            NetworkMatrix weights,
+            WeightsMatrix weights,
             NetworkVector biases,
             ActivationFunction activationfunction, 
             DerivativeFunction derivativefunction
@@ -124,11 +124,11 @@ namespace NeuralNet
             }
         }
 
-        public Layer(NetworkMatrix weights, NetworkVector biases)
+        public Layer(WeightsMatrix weights, NetworkVector biases)
             : this (weights, biases, null, null)
         { }
         
-        public Layer(NetworkMatrix weights)
+        public Layer(WeightsMatrix weights)
             : this(weights, new NetworkVector(weights.NumberOfOutputs), null, null)
         { }
         #endregion

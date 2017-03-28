@@ -11,7 +11,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void CanMake()
         {
-            WeightedCombiner combiner = new WeightedCombiner(new NetworkMatrix( new double[,] { { 1 } }) );
+            WeightedCombiner combiner = new WeightedCombiner(new WeightsMatrix( new double[,] { { 1 } }) );
             WeightedCombinerBank bank = new WeightedCombinerBank(combiner, 1);
             Assert.AreNotEqual(null, bank);
         }
@@ -32,7 +32,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void CannotMakeZeroWeightedCombinerBank()
         {
-            WeightedCombiner layer = new WeightedCombiner(new NetworkMatrix( new double[,] { { 1 } }));
+            WeightedCombiner layer = new WeightedCombiner(new WeightsMatrix( new double[,] { { 1 } }));
 
             try
             {
@@ -46,8 +46,8 @@ namespace TestNeuralNet
         [TestMethod]
         public void WeightedCombinerBankHasCorrectOutputSize()
         {
-            WeightedCombiner combiner1 = new WeightedCombiner(new NetworkMatrix( new double[,] { { 1 } }));
-            WeightedCombiner combiner2 = new WeightedCombiner(new NetworkMatrix( new double[,] { { 1 }, { 2 }, { 3 } }));
+            WeightedCombiner combiner1 = new WeightedCombiner(new WeightsMatrix( new double[,] { { 1 } }));
+            WeightedCombiner combiner2 = new WeightedCombiner(new WeightsMatrix( new double[,] { { 1 }, { 2 }, { 3 } }));
 
             WeightedCombinerBank bank1a = new WeightedCombinerBank(combiner1, 1);
             WeightedCombinerBank bank1b = new WeightedCombinerBank(combiner1, 3);
@@ -71,7 +71,7 @@ namespace TestNeuralNet
         public void UnRunWeightedCombinerBankHasZeroOutput()
         {
             int numberOfBanks = 3;
-            WeightedCombiner layer = new WeightedCombiner(new NetworkMatrix( new double[,] { { 1 } }));
+            WeightedCombiner layer = new WeightedCombiner(new WeightsMatrix( new double[,] { { 1 } }));
             WeightedCombinerBank bank = new WeightedCombinerBank(layer, numberOfBanks);
             NetworkVector outputcheck = new NetworkVector(numberOfBanks);
             Assert.AreEqual(outputcheck, bank.Output);
@@ -81,7 +81,7 @@ namespace TestNeuralNet
         public void CanRunWeightedCombinerBank()
         {
             int numberOfBanks = 3;
-            WeightedCombiner layer = new WeightedCombiner(new NetworkMatrix( new double[,] { { 1 } }));
+            WeightedCombiner layer = new WeightedCombiner(new WeightsMatrix( new double[,] { { 1 } }));
             WeightedCombinerBank bank = new WeightedCombinerBank(layer, numberOfBanks);
             NetworkVector zeroVector = new NetworkVector(numberOfBanks);
 
@@ -94,7 +94,7 @@ namespace TestNeuralNet
         public void CannotRunWeightedCombinerBankWithBadInputSize()
         {
             int numberOfBanks = 3;
-            WeightedCombiner layer = new WeightedCombiner(new NetworkMatrix( new double[,] { { 1 } }) );
+            WeightedCombiner layer = new WeightedCombiner(new WeightsMatrix( new double[,] { { 1 } }) );
             WeightedCombinerBank bank = new WeightedCombinerBank(layer, numberOfBanks);
             NetworkVector badInput = new NetworkVector(2);
 
@@ -110,7 +110,7 @@ namespace TestNeuralNet
         public void CorrectRunOneInput()
         {
             int numberOfBanks = 3;
-            WeightedCombiner layer = new WeightedCombiner(new NetworkMatrix( new double[,] { { 1 } }) );
+            WeightedCombiner layer = new WeightedCombiner(new WeightsMatrix( new double[,] { { 1 } }) );
             WeightedCombinerBank bank = new WeightedCombinerBank(layer, numberOfBanks);
             NetworkVector input = new NetworkVector(new double[] { 2, 3, 5 });
             NetworkVector outputcheck = new NetworkVector(new double[] { 2, 3, 5 });
@@ -123,7 +123,7 @@ namespace TestNeuralNet
         public void CorrectRunThreeInputs()
         {
             int numberOfBanks = 3;
-            WeightedCombiner layer = new WeightedCombiner(new NetworkMatrix( new double[,] { { 2, 3, 5 } }) );
+            WeightedCombiner layer = new WeightedCombiner(new WeightsMatrix( new double[,] { { 2, 3, 5 } }) );
             WeightedCombinerBank bank = new WeightedCombinerBank(layer, numberOfBanks);
             NetworkVector input = new NetworkVector(new double[] { 7, 7, 7, 11, 11, 11, 13, 13, 13 });
             NetworkVector outputcheck = new NetworkVector(new double[] { 70, 110, 130 });
@@ -136,7 +136,7 @@ namespace TestNeuralNet
         public void InputGradientWeightedCombinerBank()
         {
             int numberOfBanks = 3;
-            WeightedCombiner layer = new WeightedCombiner(new NetworkMatrix( new double[,] { { 1 } }) );
+            WeightedCombiner layer = new WeightedCombiner(new WeightsMatrix( new double[,] { { 1 } }) );
             WeightedCombinerBank bank = new WeightedCombinerBank(layer, numberOfBanks);
             NetworkVector zeroVector = new NetworkVector(numberOfBanks);
 
@@ -148,7 +148,7 @@ namespace TestNeuralNet
         public void CorrectInputGradientOneInput()
         {
             int numberOfBanks = 3;
-            WeightedCombiner layer = new WeightedCombiner(new NetworkMatrix( new double[,] { { 1 } } ));
+            WeightedCombiner layer = new WeightedCombiner(new WeightsMatrix( new double[,] { { 1 } } ));
             WeightedCombinerBank bank = new WeightedCombinerBank(layer, numberOfBanks);
             NetworkVector input = new NetworkVector(new double[] { 2, 3, 5 });
             NetworkVector outputGradient = new NetworkVector(new double[] { 2, 3, 5 });
@@ -161,7 +161,7 @@ namespace TestNeuralNet
         public void BackPropagateWeightedCombinerBankIsCorrect2()
         {
             int numberOfBanks = 3;
-            WeightedCombiner layer = new WeightedCombiner(new NetworkMatrix( new double[,] { { 1, 2 } } ), new NetworkVector( new double[] { 1 }) );
+            WeightedCombiner layer = new WeightedCombiner(new WeightsMatrix( new double[,] { { 1, 2 } } ), new NetworkVector( new double[] { 1 }) );
             WeightedCombinerBank bank = new WeightedCombinerBank(layer, numberOfBanks);
             NetworkVector inputVector = new NetworkVector(new double[] { 1, 1, 2, 2, 3, 3 });
             NetworkVector bpVector = new NetworkVector(new double[] { 5, 7, 11 });
@@ -169,7 +169,7 @@ namespace TestNeuralNet
             bank.Run(inputVector);
 
             NetworkVector inputGradientCheck = new NetworkVector(new double[] { 5, 10, 7, 14, 11, 22 });
-            NetworkMatrix weightsCheck = new NetworkMatrix( new double[,] { { -51, -50 } } );
+            WeightsMatrix weightsCheck = new WeightsMatrix( new double[,] { { -51, -50 } } );
             NetworkVector biasCheck = new NetworkVector( new double[] { -22 } );
             
             Assert.AreEqual(inputGradientCheck, bank.InputGradient(bpVector));
@@ -184,7 +184,7 @@ namespace TestNeuralNet
         public void BackPropagateWeightedCombinerBankIsCorrect()
         {
             int numberOfBanks = 3;
-            WeightedCombiner layer = new WeightedCombiner(new NetworkMatrix( new double[,] { { 1 } }) );
+            WeightedCombiner layer = new WeightedCombiner(new WeightsMatrix( new double[,] { { 1 } }) );
             WeightedCombinerBank bank = new WeightedCombinerBank(layer, numberOfBanks);
             NetworkVector inputVector = new NetworkVector(new double[] { 1, 2, 3 });
             NetworkVector bpVector = new NetworkVector(new double[] { 5, 7, 11 });
@@ -197,7 +197,7 @@ namespace TestNeuralNet
             bank.BackPropagate(bpVector);
             bank.Update(new GradientDescent());
 
-            NetworkMatrix weightsCheck = new NetworkMatrix( new double[,] { { -51 } } );
+            WeightsMatrix weightsCheck = new WeightsMatrix( new double[,] { { -51 } } );
             NetworkVector biasCheck = new NetworkVector( new double[] { -23 } );
 
             Assert.AreEqual(biasCheck, bank.Biases);
@@ -208,7 +208,7 @@ namespace TestNeuralNet
         public void CannotBackPropagateWeightedCombinerBankWithBadOutputGradientSize()
         {
             int numberOfBanks = 3;
-            WeightedCombiner layer = new WeightedCombiner(new NetworkMatrix( new double[,] { { 1 } }) );
+            WeightedCombiner layer = new WeightedCombiner(new WeightsMatrix( new double[,] { { 1 } }) );
             WeightedCombinerBank bank = new WeightedCombinerBank(layer, numberOfBanks);
             NetworkVector badGradient = new NetworkVector(2);
 

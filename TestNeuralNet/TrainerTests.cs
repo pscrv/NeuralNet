@@ -12,7 +12,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void CanMake()
         {
-            NetworkMatrix matrix = new NetworkMatrix(new double[,] { { 1, 1 } });
+            WeightsMatrix matrix = new WeightsMatrix(new double[,] { { 1, 1 } });
             WeightedCombiner wc = new WeightedCombiner(matrix);
 
             Trainer trainer = new Trainer(wc, new SquaredError(), new GradientDescent());
@@ -22,7 +22,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void CanRunOnline_WC()
         {
-            NetworkMatrix matrix = new NetworkMatrix(new double[,] { { 1, 1 } });
+            WeightsMatrix matrix = new WeightsMatrix(new double[,] { { 1, 1 } });
             WeightedCombiner wc = new WeightedCombiner(matrix);
             TrainingCollection trainingVectors = new TrainingCollection
             {
@@ -36,7 +36,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void CanRunOnline_LinearLayer()
         {
-            NetworkMatrix matrix = new NetworkMatrix(new double[,] { { 1, 1 } });
+            WeightsMatrix matrix = new WeightsMatrix(new double[,] { { 1, 1 } });
             Layer layer = Layer.CreateLinearLayer(matrix);
             TrainingCollection trainingVectors = new TrainingCollection
             {
@@ -53,7 +53,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void CanRunOnline_LogisticLayer()
         {
-            NetworkMatrix matrix = new NetworkMatrix(new double[,] { { 1, 1 } });
+            WeightsMatrix matrix = new WeightsMatrix(new double[,] { { 1, 1 } });
             Layer layer = Layer.CreateLogisticLayer(matrix);
             TrainingCollection trainingVectors = new TrainingCollection
             {
@@ -73,7 +73,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void TrainOnline_LinearLayer_CorrectOnePass()
         {
-            NetworkMatrix matrix = new NetworkMatrix(new double[,] { { 1, 1 } });
+            WeightsMatrix matrix = new WeightsMatrix(new double[,] { { 1, 1 } });
             Layer layer = Layer.CreateLinearLayer(matrix);
             TrainingCollection trainingVectors = new TrainingCollection
             {
@@ -101,7 +101,7 @@ namespace TestNeuralNet
                 trainer.Train(tc);
             }
 
-            NetworkMatrix weightsCheck = new NetworkMatrix(new double[,] { { 1, 3 } });
+            WeightsMatrix weightsCheck = new WeightsMatrix(new double[,] { { 1, 3 } });
             NetworkVector biasesCheck = new NetworkVector(new double[] { 1 });
 
             Assert.AreEqual(biasesCheck, layer.Biases);
@@ -111,7 +111,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void TrainOnline_WC_CorrectOnePass()
         {
-            NetworkMatrix matrix = new NetworkMatrix(new double[,] { { 1, 1 } });
+            WeightsMatrix matrix = new WeightsMatrix(new double[,] { { 1, 1 } });
             WeightedCombiner wc = new WeightedCombiner(matrix);
             TrainingCollection trainingVectors = new TrainingCollection
             {
@@ -139,7 +139,7 @@ namespace TestNeuralNet
                 trainer.Train(tc);
             }
             
-            NetworkMatrix weightsCheck = new NetworkMatrix(new double[,] { { 1, 3 } });
+            WeightsMatrix weightsCheck = new WeightsMatrix(new double[,] { { 1, 3 } });
             NetworkVector biasesCheck = new NetworkVector(new double[] { 1 });
 
             Assert.AreEqual(biasesCheck, wc.Biases);
@@ -149,7 +149,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void TrainOnline_WC_CorrectTwoPasses()
         {
-            NetworkMatrix matrix = new NetworkMatrix(new double[,] { { 1, 1 } });
+            WeightsMatrix matrix = new WeightsMatrix(new double[,] { { 1, 1 } });
             WeightedCombiner wc = new WeightedCombiner(matrix);
             TrainingCollection trainingVectors = new TrainingCollection
             {
@@ -181,7 +181,7 @@ namespace TestNeuralNet
                 trainer.Train(tc);
             }
 
-            NetworkMatrix weightsCheck = new NetworkMatrix( new double[,] { { 3, 5 } } );
+            WeightsMatrix weightsCheck = new WeightsMatrix( new double[,] { { 3, 5 } } );
             NetworkVector biasesCheck = new NetworkVector( new double[] { 1 } );
 
             Assert.AreEqual(biasesCheck, wc.Biases);
@@ -191,7 +191,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void TrainOnline_WC_CorrectThreePasses()
         {
-            NetworkMatrix matrix = new NetworkMatrix(new double[,] { { 1, 1 } });
+            WeightsMatrix matrix = new WeightsMatrix(new double[,] { { 1, 1 } });
             WeightedCombiner wc = new WeightedCombiner(matrix);
             TrainingCollection trainingVectors = new TrainingCollection
             {
@@ -227,7 +227,7 @@ namespace TestNeuralNet
                 trainer.Train(tc);
             }
 
-            NetworkMatrix weightsCheck = new NetworkMatrix( new double[,] { { 3, 7 } } );
+            WeightsMatrix weightsCheck = new WeightsMatrix( new double[,] { { 3, 7 } } );
             NetworkVector biasesCheck = new NetworkVector( new double[] { -1 } );
 
             Assert.AreEqual(biasesCheck, wc.Biases);
@@ -252,8 +252,8 @@ namespace TestNeuralNet
                 for (int j = 0; j < inputneurons; j++)
                     outputWeights[i, j] = 1;
             
-            Layer InputLayer = Layer.CreateLinearLayer(new NetworkMatrix(inputWeights), new NetworkVector(inputneurons));
-            Layer OutputLayer = Layer.CreateLinearLayer(new NetworkMatrix(outputWeights), new NetworkVector(outputneurons));
+            Layer InputLayer = Layer.CreateLinearLayer(new WeightsMatrix(inputWeights), new NetworkVector(inputneurons));
+            Layer OutputLayer = Layer.CreateLinearLayer(new WeightsMatrix(outputWeights), new NetworkVector(outputneurons));
 
             NetComponentChain network = new NetComponentChain();
             network.AddTrainable(InputLayer);
@@ -285,9 +285,9 @@ namespace TestNeuralNet
                 trainer.Train(tc);
             }
 
-            NetworkMatrix inputWeightsCheck = new NetworkMatrix(new double[,] { { -35499715, -35499260, 1 }, { -35499715, -35499260, 1 } });
+            WeightsMatrix inputWeightsCheck = new WeightsMatrix(new double[,] { { -35499715, -35499260, 1 }, { -35499715, -35499260, 1 } });
             NetworkVector inputBiasesCheck = new NetworkVector(new double[] { -35499265, -35499265 });
-            NetworkMatrix outputWeightsCheck = new NetworkMatrix(new double[,] { { -224831362, -224831362 } });
+            WeightsMatrix outputWeightsCheck = new WeightsMatrix(new double[,] { { -224831362, -224831362 } });
             NetworkVector outputBiasesCheck = new NetworkVector(new double[] { -251825 });
 
             Assert.AreEqual(inputWeightsCheck, InputLayer.Weights);
@@ -303,7 +303,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void BatchTrainCorrectOnePass_WC()
         {
-            NetworkMatrix matrix = new NetworkMatrix(new double[,] { { 1, 1 } });
+            WeightsMatrix matrix = new WeightsMatrix(new double[,] { { 1, 1 } });
             WeightedCombiner wc = new WeightedCombiner(matrix);
             TrainingCollection trainingVectors = new TrainingCollection
         {
@@ -328,7 +328,7 @@ namespace TestNeuralNet
             Trainer trainer = new Trainer(wc, new SquaredError(), new GradientDescent());
             trainer.Train(trainingVectors);
 
-            NetworkMatrix weightsCheck = new NetworkMatrix(new double[,] { { -1, -1 } });
+            WeightsMatrix weightsCheck = new WeightsMatrix(new double[,] { { -1, -1 } });
             NetworkVector biasesCheck = new NetworkVector(new double[] { -2 });
 
             Assert.AreEqual(biasesCheck, wc.Biases);
@@ -338,7 +338,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void BatchTrainCorrectOnePass_LinearLayer()
         {
-            NetworkMatrix matrix = new NetworkMatrix(new double[,] { { 1, 1 } });
+            WeightsMatrix matrix = new WeightsMatrix(new double[,] { { 1, 1 } });
             Layer layer = Layer.CreateLinearLayer(matrix);
             TrainingCollection trainingVectors = new TrainingCollection
         {
@@ -363,7 +363,7 @@ namespace TestNeuralNet
             Trainer trainer = new Trainer(layer, new SquaredError(), new GradientDescent());
             trainer.Train(trainingVectors);
 
-            NetworkMatrix weightsCheck = new NetworkMatrix(new double[,] { { -1, -1 } });
+            WeightsMatrix weightsCheck = new WeightsMatrix(new double[,] { { -1, -1 } });
             NetworkVector biasesCheck = new NetworkVector(new double[] { -2 });
 
             Assert.AreEqual(biasesCheck, layer.Biases);
@@ -373,7 +373,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void BatchTrainCorrectTwoPasses_WC()
         {
-            NetworkMatrix matrix = new NetworkMatrix(new double[,] { { 1, 1 } });
+            WeightsMatrix matrix = new WeightsMatrix(new double[,] { { 1, 1 } });
             WeightedCombiner wc = new WeightedCombiner(matrix);
             TrainingCollection trainingVectors = new TrainingCollection
         {
@@ -399,7 +399,7 @@ namespace TestNeuralNet
             trainer.Train(trainingVectors);
             trainer.Train(trainingVectors);
 
-            NetworkMatrix weightsCheck = new NetworkMatrix(new double[,] { { 7, 7 } });
+            WeightsMatrix weightsCheck = new WeightsMatrix(new double[,] { { 7, 7 } });
             NetworkVector biasesCheck = new NetworkVector(new double[] { 12 });
 
             Assert.AreEqual(biasesCheck, wc.Biases);
@@ -409,7 +409,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void BatchTrainCorrectThreePasses_WC()
         {
-            NetworkMatrix matrix = new NetworkMatrix(new double[,] { { 1, 1 } });
+            WeightsMatrix matrix = new WeightsMatrix(new double[,] { { 1, 1 } });
             WeightedCombiner wc = new WeightedCombiner(matrix);
             TrainingCollection trainingVectors = new TrainingCollection
         {
@@ -436,7 +436,7 @@ namespace TestNeuralNet
             trainer.Train(trainingVectors);
             trainer.Train(trainingVectors);
 
-            NetworkMatrix weightsCheck = new NetworkMatrix(new double[,] { { -37, -37 } });
+            WeightsMatrix weightsCheck = new WeightsMatrix(new double[,] { { -37, -37 } });
             NetworkVector biasesCheck = new NetworkVector(new double[] { -62 });
 
             Assert.AreEqual(biasesCheck, wc.Biases);
@@ -461,8 +461,8 @@ namespace TestNeuralNet
                 for (int j = 0; j < inputneurons; j++)
                     outputWeights[i, j] = 1;
 
-            Layer InputLayer = Layer.CreateLinearLayer(new NetworkMatrix(inputWeights), new NetworkVector(inputneurons));
-            Layer OutputLayer = Layer.CreateLinearLayer(new NetworkMatrix(outputWeights), new NetworkVector(outputneurons));
+            Layer InputLayer = Layer.CreateLinearLayer(new WeightsMatrix(inputWeights), new NetworkVector(inputneurons));
+            Layer OutputLayer = Layer.CreateLinearLayer(new WeightsMatrix(outputWeights), new NetworkVector(outputneurons));
 
             NetComponentChain network = new NetComponentChain();
             network.AddTrainable(InputLayer);
@@ -492,9 +492,9 @@ namespace TestNeuralNet
             Trainer trainer = new Trainer(network, new SquaredError(), new GradientDescent());
             trainer.Train(trainingVectors);
 
-            NetworkMatrix inputWeightsCheck = new NetworkMatrix(new double[,] { { -4, -4, 1 }, { -4, -4, 1 } });
+            WeightsMatrix inputWeightsCheck = new WeightsMatrix(new double[,] { { -4, -4, 1 }, { -4, -4, 1 } });
             NetworkVector inputBiasesCheck = new NetworkVector(new double[] { -6, -6 });
-            NetworkMatrix outputWeightsCheck = new NetworkMatrix(new double[,] { { -9, -9 } });
+            WeightsMatrix outputWeightsCheck = new WeightsMatrix(new double[,] { { -9, -9 } });
             NetworkVector outputBiasesCheck = new NetworkVector(new double[] { -6 });
 
             Assert.AreEqual(inputWeightsCheck, InputLayer.Weights);

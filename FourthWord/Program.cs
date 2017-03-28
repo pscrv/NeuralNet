@@ -2,6 +2,7 @@
 using System.Diagnostics;
 
 using NeuralNet;
+using System.Linq;
 
 namespace FourthWord
 {
@@ -9,23 +10,37 @@ namespace FourthWord
     {
         static void Main(string[] args)
         {
-            ITrainable network = new FourthWordNetwork();
-            Trainer trainer = new Trainer(network, new SquaredError(), new GradientDescent());
-            TrainingCollection trainingData = TrainingDataProvider.GetTrainingCollection();
+            FourthWordNetwork network = new FourthWordNetwork();
+            DataReader reader = new DataReader();
+            Trainer trainer = new Trainer(network, new SoftMaxWithCrossEntropy(), new GradientDescent(0.00001, 100));
 
             Stopwatch sw = new Stopwatch();
-            sw.Start();
-            for (int i = 0; i < 1000; i++)
-            {
-                if (i % 100 == 0)
-                {
-                    Console.WriteLine(string.Format("  i = {0}    < {1} ms>", i, sw.ElapsedMilliseconds));
-                }
+            Console.WriteLine("Starting training, one epoch, in batches of size 100.");
 
-                trainer.Train(trainingData);
+            TimeSpan lastTotalElapsed = new TimeSpan();
+            TimeSpan totalElapsed = new TimeSpan();
+            sw.Start();
+            int count = 0;
+            foreach (TrainingCollection batch in reader.TrainingDataCollection.AsBatches(100))
+            {
+                VectorPair[] x = batch.ToArray();
+
+                //trainer.ParallelTrain(batch);
+                trainer.Train(batch);
+                totalElapsed = sw.Elapsed;
+
+                Console.Write(
+                    string.Format(
+                        "   batch {0}   Cost {1}   <{2}>\r", 
+                        count, 
+                        trainer.Cost,
+                        totalElapsed - lastTotalElapsed)
+                    );
+                lastTotalElapsed = totalElapsed;
+                count++;
             }
-            sw.Stop();
-            Console.WriteLine(string.Format("Finished in {0} ms.>", sw.ElapsedMilliseconds));
+           
+
             Console.ReadLine();
         }
     }

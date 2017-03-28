@@ -12,8 +12,8 @@ namespace TestNeuralNet
         WeightedCombiner wc_1;
         WeightedCombiner wc_1b;
 
-        NetworkMatrix matrix_1 = new NetworkMatrix(new double[,] { { 1 } });
-        NetworkMatrix matrix_2 = new NetworkMatrix(new double[,] { { 1, 2, 3 }, { 2, 3, 4 } });
+        WeightsMatrix matrix_1 = new WeightsMatrix(new double[,] { { 1 } });
+        WeightsMatrix matrix_2 = new WeightsMatrix(new double[,] { { 1, 2, 3 }, { 2, 3, 4 } });
 
         NetworkVector vector_1 = new NetworkVector(new double[] { 1 });
         NetworkVector vector_2 = new NetworkVector(new double[] { 11, 12 });
@@ -93,7 +93,7 @@ namespace TestNeuralNet
 
             NetworkVector inputGradientCheck = vector_1.Copy();
             NetworkVector biasesGradientCheck = vector_1.Copy();
-            NetworkMatrix weightsGradientCheck = matrix_1.Copy();
+            WeightsMatrix weightsGradientCheck = matrix_1.Copy();
 
             Assert.AreEqual(inputGradientCheck, wc_1b.InputGradient(vector_1));
             Assert.AreEqual(biasesGradientCheck, wc_1b.BiasesGradient(vector_1));
@@ -111,7 +111,7 @@ namespace TestNeuralNet
             NetworkVector biasesGradientCheck = new NetworkVector(
                 new double[] { 11, 12 }
                 );
-            NetworkMatrix weightsGradientCheck = new NetworkMatrix(
+            WeightsMatrix weightsGradientCheck = new WeightsMatrix(
                 new double[,] { { 11*111, 11*112, 11*113 }, { 12*111, 12*112, 12*113 } }
                 );
 
@@ -125,12 +125,12 @@ namespace TestNeuralNet
         {
             wc_2.Run(vector_3);
 
-            AdaptationStrategy strategy = new GradientDescent(1.0);
+            AdaptationStrategy strategy = new GradientDescent(1.0, 1);
             wc_2.BackPropagate(vector_2);
             wc_2.Update(strategy);
             
             NetworkVector biasesCheck = new NetworkVector(new double[] { 0, 0});
-            NetworkMatrix weightsCheck = new NetworkMatrix(new double[,] { { 1 - (11 * 111), 2 - (11 * 112), 3 - (11 * 113) }, { 2 -  (12 * 111), 3 - (12 * 112), 4 - (12 * 113) } });
+            WeightsMatrix weightsCheck = new WeightsMatrix(new double[,] { { 1 - (11 * 111), 2 - (11 * 112), 3 - (11 * 113) }, { 2 -  (12 * 111), 3 - (12 * 112), 4 - (12 * 113) } });
             Assert.AreEqual(biasesCheck, wc_2.Biases);
             Assert.AreEqual(weightsCheck, wc_2.Weights);
 
