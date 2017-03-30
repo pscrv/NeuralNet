@@ -205,7 +205,7 @@ namespace NeuralNet
             get
             {
                 if (index < 0 || index >= Length)
-                    throw new IndexOutOfRangeException();
+                    throw new ArgumentOutOfRangeException();
                 return (index == _index) ? 1.0 : 0.0;
             }
 
@@ -272,7 +272,7 @@ namespace NeuralNet
             get
             {
                 if (index < 0)
-                    throw new IndexOutOfRangeException();
+                    throw new ArgumentOutOfRangeException();
 
                 int count = 0;
                 foreach (Vector vector in _vectors)
@@ -281,7 +281,7 @@ namespace NeuralNet
                         return vector[index - count];
                     count++;
                 }
-                throw new IndexOutOfRangeException();
+                throw new ArgumentOutOfRangeException();
             }
 
             set

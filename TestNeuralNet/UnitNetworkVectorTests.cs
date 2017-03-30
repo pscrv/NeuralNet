@@ -55,19 +55,19 @@ namespace TestNeuralNet
             catch (IndexOutOfRangeException)
             { }
         }
-        
-        [TestMethod]
-        public void CannotZero()
-        {
-            NetworkVector vector = new UnitNetworkVector(1, 2);
 
-            try
-            {
-                vector.Zero();
-                Assert.Fail("Failure to throw an InvalidOperationException.");
-            }
-            catch (InvalidOperationException) { }
-        }
+        //[TestMethod]
+        //public void CannotZero()
+        //{
+        //    NetworkVector vector = new UnitNetworkVector(1, 2);
+
+        //    try
+        //    {
+        //        vector.Zero();
+        //        Assert.Fail("Failure to throw an InvalidOperationException.");
+        //    }
+        //    catch (InvalidOperationException) { }
+        //}
 
         [TestMethod]
         public void CanCompareEquality()
@@ -94,7 +94,7 @@ namespace TestNeuralNet
             Assert.AreEqual(vector1.GetHashCode(), vector2.GetHashCode());
             Assert.AreNotEqual(vector1.GetHashCode(), vector3.GetHashCode());
         }
-        
+
 
         [TestMethod]
         public void CanMakeAndReadBigUnitNetworkVector()
@@ -121,25 +121,10 @@ namespace TestNeuralNet
             Assert.AreEqual(0.0, vectorValues[1]);
         }
 
-
-        [TestMethod]
-        public void CannotSubtract()
-        {
-            NetworkVector vector = new UnitNetworkVector(0, 5);
-
-            try
-            {
-                vector.Subtract(vector);
-                Assert.Fail("Failure to throw and InvalidOperationException.");
-            }
-            catch (InvalidOperationException) { }
-
-        }
-
         [TestMethod]
         public void CanSum()
         {
-            int listSize = 1000000;
+            int listSize = 100;
             NetworkVector vector = new UnitNetworkVector(0, 5);
             List<NetworkVector> list = new List<NetworkVector>();
 
@@ -192,5 +177,5 @@ namespace TestNeuralNet
             Assert.AreEqual(vector1Values[1], vector2Values[1]);
         }
     }
-    
+
 }

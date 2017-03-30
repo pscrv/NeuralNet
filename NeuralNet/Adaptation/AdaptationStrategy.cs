@@ -30,14 +30,14 @@ namespace NeuralNet
         public override NetworkVector BiasesUpdate(NetworkVector gradient)
         {
             NetworkVector result = gradient.Copy();
-            result.MultiplyBy(-_stepSize / _batchSize);
+            result.Scale(-_stepSize / _batchSize);
             return result;
         }
 
         public override WeightsMatrix WeightsUpdate(WeightsMatrix gradient)
         {
             WeightsMatrix result = gradient.Copy();
-            result.MultiplyBy(-_stepSize / _batchSize);
+            result.Scale(-_stepSize / _batchSize);
             return result;
         }
         #endregion

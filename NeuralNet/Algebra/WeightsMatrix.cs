@@ -1,124 +1,94 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
+using MathNet.Numerics.LinearAlgebra;
 
 namespace NeuralNet
 {
     public class WeightsMatrix
     {
         #region private attributes
-        private double[,] _matrix;
+        private Matrix<double> _matrix;
         #endregion
 
         #region public properties
-        public int NumberOfOutputs { get { return _matrix.GetLength(0); } }
-        public int NumberOfInputs { get { return _matrix.GetLength(1); } }        
+        public int NumberOfOutputs { get { return _matrix.RowCount; } }
+        public int NumberOfInputs { get { return _matrix.ColumnCount; } }
         #endregion
 
 
         #region constructors
         public WeightsMatrix(double[,] matrix)
         {
-            _matrix = (double[,])matrix.Clone();
+            _matrix = Matrix<double>.Build.DenseOfArray(matrix);
         }
 
         public WeightsMatrix(int neurons, int inputs)
         {
-            _matrix = new double[neurons, inputs];
+            _matrix = Matrix<double>.Build.Dense(neurons, inputs);
+        }
+
+        public WeightsMatrix(Matrix<double> matrix)
+        {
+            _matrix = matrix;
         }
         #endregion
 
 
         #region public methods
-        public void MultiplyBy(double factor)
+        public void Scale(double factor)
         {
-            for (int i = 0; i < NumberOfOutputs; i++)
-                for (int j = 0; j < NumberOfInputs; j++)
-                    _matrix[i, j] *= factor;
+            _matrix = _matrix.Multiply(factor);
         }
 
         public void Add(WeightsMatrix other)
         {
-            for (int i = 0; i < NumberOfOutputs; i++)
-            {
-                for (int j = 0; j < NumberOfInputs; j++)
-                {
-                    this._matrix[i, j] += other._matrix[i, j];
-                }
-            }
+            _matrix = _matrix.Add(other._matrix);
         }
 
         public void Subtract(WeightsMatrix other)
         {
-            for (int i = 0; i < NumberOfOutputs; i++)
-            {
-                for (int j = 0; j < NumberOfInputs; j++)
-                {
-                    this._matrix[i, j] -= other._matrix[i, j];
-                }
-            }
+            _matrix = _matrix.Subtract(other._matrix);
         }
 
         public void Zero()
         {
-            for (int i = 0; i < NumberOfOutputs; i++)
-                for (int j = 0; j < NumberOfInputs; j++)
-                    _matrix[i, j] = 0.0;
+            _matrix.Clear();
         }
         
         public NetworkVector LeftMultiply(NetworkVector vector)
         {
-            double[] vectorarray = vector.ToArray();
-            double sum;
-            double[] result = new double[NumberOfOutputs];
-            for (int i = 0; i < NumberOfOutputs; i++)
-            {
-                sum = 0;
-                for (int j = 0; j < vector.Dimension; j++)
-                {
-                    sum += _matrix[i, j] * vectorarray[j];
-                }
-                result[i] = sum;
-            }
-
-            return new NetworkVector(result);
+            return new NetworkVector(_matrix.Multiply(vector.Vector));
         }
         
         public NetworkVector DotWithWeightsPerInput(NetworkVector vector)
         {
-            double[] result = new double[NumberOfInputs];
-            NetworkVector inputWeights;
-            for (int i = 0; i < NumberOfInputs; i++)
+            Vector<double> result = Vector<double>.Build.Dense(_matrix.ColumnCount);
+
+            foreach (Tuple<int, Vector<double>> index_column in _matrix.EnumerateColumnsIndexed())
             {
-                inputWeights = _getWeightsForOneInput(i);
-                result[i] = vector.DotProduct(inputWeights);
+                result[index_column.Item1] = index_column.Item2.DotProduct(vector.Vector);
             }
-            
+
             return new NetworkVector(result);
+
         }
 
         public WeightsMatrix Copy()
         {
-            return new WeightsMatrix(_matrix.Clone() as double[,]);
+            return new WeightsMatrix(_matrix);
         }
 
         public double[,] ToArray()
         {
-            return (double[,]) _matrix.Clone();
+            return _matrix.ToArray();
         }
         #endregion
 
         #region private methods
         private NetworkVector _getWeightsForOneInput(int inputindex)
         {
-            double[] result = new double[NumberOfOutputs];
-            for (int i = 0; i < NumberOfOutputs; i++)
-            {
-                result[i] = _matrix[i, inputindex];
-            }
-            return new NetworkVector(result);
+            return new NetworkVector( _matrix.Column(inputindex) );
         }
         #endregion
 

@@ -106,7 +106,7 @@ namespace TestNeuralNet
         [TestMethod]
         public void CanSum()
         {
-            int listSize = 1000000;
+            int listSize = 100;
             NetworkVector vector = new NetworkVector(new double[] { 0, 1, 2, 3, 4, 5 });
             List<NetworkVector> list = new List<NetworkVector>();
 
@@ -144,6 +144,11 @@ namespace TestNeuralNet
             Assert.AreEqual(1, productValues[0, 1]);
             Assert.AreEqual(0, productValues[1, 0]);
             Assert.AreEqual(0, productValues[1, 1]);
+
+            //double[] array = new double[1000];
+            //array[0] = 1;
+            //NetworkVector nv = new NetworkVector(array);
+            //nv.LeftMultiply(nv);
         }
 
         [TestMethod]
