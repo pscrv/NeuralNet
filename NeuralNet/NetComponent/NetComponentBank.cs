@@ -13,27 +13,11 @@ namespace NeuralNet
         protected NetworkVector _output;
         #endregion
 
+        
 
         #region NetComponent overrides
         public override int NumberOfInputs { get { return _input.Dimension; } }
         public override int NumberOfOutputs { get { return _output.Dimension; } }
-        public override NetworkVector Input { get { return _input; } set { _input = value; } }
-        public override NetworkVector Output { get { return _output; } protected set { _output = value; } }
-
-        public override void Run(NetworkVector inputvalues)
-        {
-            if (inputvalues.Dimension != NumberOfInputs)
-                throw new ArgumentException("Input dimension does not match this Layer.");
-
-            Input = inputvalues;
-
-            List<NetworkVector> outputParts = new List<NetworkVector>();
-            foreach (NetworkVector inputPart in _segment(_input))
-            {
-                outputParts.Add(Biases.SumWith(Weights.LeftMultiply(inputPart)));
-            }
-            Output = NetworkVector.Concatenate(outputParts);
-        }
         #endregion
 
 
@@ -49,9 +33,9 @@ namespace NeuralNet
         public override WeightsMatrix WeightsGradient(NetworkVector outputgradient)
         {
             WeightsMatrix weightsGradient = new WeightsMatrix(Weights.NumberOfOutputs, Weights.NumberOfInputs);
-            foreach (var pair in _segmentAndPair(_input, outputgradient))
+            foreach (var pair in _segmentAndPair(VectorInput, outputgradient))
             {
-                weightsGradient.Add(pair.Second.LeftMultiply(pair.First));
+                weightsGradient.Add(pair.Second.OuterProduct(pair.First));
             }
 
             return weightsGradient;
@@ -71,18 +55,87 @@ namespace NeuralNet
             return NetworkVector.Concatenate(inputGradientParts);
         }
 
+        public override VectorBatch InputGradient(VectorBatch outputgradients)
+        {
+            if (outputgradients == null || outputgradients.Dimension != NumberOfOutputs)
+                throw new ArgumentException("outputgradient may not be null and must have dimension equal to NumberOfNeurons.");
+
+            List<VectorBatch> inputGradientParts = new List<VectorBatch>();
+            foreach (VectorBatch outputGradientPart in _segment(outputgradients))
+            {
+                inputGradientParts.Add(Weights.LeftMultiplyBy(outputGradientPart));
+            }
+
+            return VectorBatch.Concatenate(inputGradientParts);
+        }
+
         public override void BackPropagate(NetworkVector outputgradient)
         {
-            foreach (var pair in _segmentAndPair(_input, outputgradient))
+            BackPropagate(outputgradient, VectorInput);
+        }
+
+        public override void BackPropagate(NetworkVector outputgradient, NetworkVector input)
+        {
+            foreach (var pair in _segmentAndPair(input, outputgradient))
             {
-                _component.Input = pair.First;
-                _component.BackPropagate(pair.Second);
+                _component.BackPropagate(pair.Second, pair.First);
+            }
+        }
+
+        public override void BackPropagate(VectorBatch outputgradient)
+        {
+            BackPropagate(outputgradient, BatchInput);
+        }
+
+        public override void BackPropagate(VectorBatch outputgradient, VectorBatch input)
+        {
+            foreach (var pair in _segmentAndPair(input, outputgradient))
+            {
+                _component.BackPropagate(pair.Second, pair.First);
             }
         }
 
         public override void Update(AdaptationStrategy strategy)
         {
             _component.Update(strategy);
+        }
+
+        protected override NetworkVector _run(NetworkVector inputvalues)
+        {
+            if (inputvalues.Dimension != NumberOfInputs)
+                throw new ArgumentException("Input dimension does not match this Layer.");
+
+            VectorInput = inputvalues;
+            BatchInput = null;
+
+            List<NetworkVector> outputParts = new List<NetworkVector>();
+            foreach (NetworkVector inputPart in _segment(inputvalues))
+            {
+                outputParts.Add(Biases.SumWith(Weights.LeftMultiply(inputPart)));
+            }
+
+            return NetworkVector.Concatenate(outputParts);
+            
+        }
+
+        protected override VectorBatch _run(VectorBatch inputbatch)
+        {
+            if (inputbatch.Dimension != NumberOfInputs)
+                throw new ArgumentException("Input dimension does not match this Layer.");
+
+            VectorInput = null;
+            BatchInput = inputbatch;
+
+            List<VectorBatch> outputParts = new List<VectorBatch>();
+            VectorBatch result;
+            foreach (VectorBatch inputPart in _segment(inputbatch))
+            {
+                result = Weights.TransposeAndLeftMultiplyBy(inputPart);
+                result.AddVectorToEachRow(Biases);
+                outputParts.Add(result);
+            }
+
+            return VectorBatch.Concatenate(outputParts);
         }
         #endregion
 
@@ -108,9 +161,19 @@ namespace NeuralNet
             return vectortoSegment.Segment(_repetitions);
         }
 
+        protected List<VectorBatch> _segment(VectorBatch batchToSegment)
+        {
+            return batchToSegment.Segment(_repetitions);
+        }
+
         protected IEnumerable<VectorPair> _segmentAndPair(NetworkVector first, NetworkVector second)
         {
             return _segment(first).Zip(_segment(second), (a, b) => new VectorPair(a, b));
+        }
+
+        protected IEnumerable<BatchPair> _segmentAndPair(VectorBatch first, VectorBatch second)
+        {
+            return _segment(first).Zip(_segment(second), (a, b) => new BatchPair(a, b));
         }
         #endregion
 

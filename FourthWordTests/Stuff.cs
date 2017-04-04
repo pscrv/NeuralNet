@@ -1,27 +1,22 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using FourthWord;
-using Accord.IO;
+using NeuralNet;
+using MathNet.Numerics.LinearAlgebra;
+using System.Collections.Generic;
 
 namespace FourthWordTests
 {
     [TestClass]
     public class Stuff
     {
+
         [TestMethod]
-        public void TestStuff()
+        public void AsMatrix()
         {
-            DataReader reader = new DataReader();
-
-            var x = reader.TrainingData;
-            var y = reader.TrainingDataCollection;
-            y.Add(new NeuralNet.VectorPair(new NeuralNet.NetworkVector(1), new NeuralNet.NetworkVector(1)));
-            foreach (var item in y)
-            {
-
-            }
-
+            NetworkVector vector = new NetworkVector(new double[] { 1, 2, 3 });
+            VectorBatch batch = new VectorBatch(new List<NetworkVector> { vector, vector });
+            Matrix<double> result = batch.AsMatrix();
         }
     }
 }

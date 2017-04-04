@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using MathNet.Numerics.LinearAlgebra;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using NeuralNet;
 using System;
@@ -138,7 +139,7 @@ namespace TestNeuralNet
         {
             NetworkVector vector1 = new NetworkVector(new double[] { 1, 0 });
             NetworkVector vector2 = new NetworkVector(new double[] { 0, 1 });
-            WeightsMatrix product = vector1.LeftMultiply(vector2);
+            WeightsMatrix product = vector1.OuterProduct(vector2);
             double[,] productValues = product.ToArray();
             Assert.AreEqual(0, productValues[0, 0]);
             Assert.AreEqual(1, productValues[0, 1]);
@@ -224,17 +225,15 @@ namespace TestNeuralNet
             Assert.AreEqual(1, resultValues[1]);
         }
 
-        [TestMethod]
-        public void CanDotWithWeightsPerInput()
-        {
-            WeightsMatrix matrix = new WeightsMatrix(new double[,] { { 0, 1 }, { 1, 0 } });
-            NetworkVector vector = new NetworkVector(new double[] { 1, 0 });
-            NetworkVector result = matrix.DotWithWeightsPerInput(vector);
 
-            double[] resultValues = result.ToArray();
-            Assert.AreEqual(0, resultValues[0]);
-            Assert.AreEqual(1, resultValues[1]);
+        [TestMethod]
+        public void AsMatrix()
+        {
+            NetworkVector vector = new NetworkVector(new double[] { 1, 2 });
+            Matrix<double> result = vector.AsMatrix();
         }
+
+
 
         //TODO: write tests for equality and hash
 

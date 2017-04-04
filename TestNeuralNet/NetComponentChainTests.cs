@@ -66,14 +66,14 @@ namespace TestNeuralNet
             { }
         }
 
-        [TestMethod]
-        public void UnrunNetworkHasZeroOutput()
-        {
-            Layer layer = Layer.CreateLinearLayer(new NeuralNet.WeightsMatrix(new double[,] { { 1 }, { 2 }, { 3 } }));
-            NetComponentChain layerlist = new NetComponentChain(layer);
-            NeuralNet.NetworkVector outputCheck = new NeuralNet.NetworkVector(new double[] { 0, 0, 0 });
-            Assert.AreEqual(outputCheck, layerlist.Output);
-        }
+        //[TestMethod]
+        //public void UnrunNetworkHasZeroOutput()
+        //{
+        //    Layer layer = Layer.CreateLinearLayer(new NeuralNet.WeightsMatrix(new double[,] { { 1 }, { 2 }, { 3 } }));
+        //    NetComponentChain layerlist = new NetComponentChain(layer);
+        //    NeuralNet.NetworkVector outputCheck = new NeuralNet.NetworkVector(new double[] { 0, 0, 0 });
+        //    Assert.AreEqual(outputCheck, layerlist.Output);
+        //}
 
         [TestMethod]
         public void CannotRunWithInputOfWrongSize()
@@ -97,8 +97,8 @@ namespace TestNeuralNet
             Layer layer = Layer.CreateLinearLayer(new NeuralNet.WeightsMatrix( new double[,] { { 1 } }) );
             NetComponentChain layerlist = new NetComponentChain(layer);
             NeuralNet.NetworkVector vector = new NeuralNet.NetworkVector(new double[] { 0 });
-            layerlist.Run(vector);
-            Assert.AreEqual(vector, layerlist.Output);
+            NetworkVector result = layerlist.Run(vector);
+            Assert.AreEqual(vector, result);
         }
 
         [TestMethod]
@@ -109,11 +109,11 @@ namespace TestNeuralNet
             NetComponentChain layerlist = new NetComponentChain(layer1);
             layerlist.AddFixed(layer2);
             NeuralNet.NetworkVector vector = new NeuralNet.NetworkVector(new double[] { 0, 0 });
-            layerlist.Run(vector);
+            NetworkVector result = layerlist.Run(vector);
 
 
             NeuralNet.NetworkVector outputCheck = new NeuralNet.NetworkVector(new double[] { 0 });
-            Assert.AreEqual(outputCheck, layerlist.Output);
+            Assert.AreEqual(outputCheck, result);
         }
 
         [TestMethod]
@@ -126,10 +126,10 @@ namespace TestNeuralNet
             network.AddTrainable(outputlayer);
 
             NeuralNet.NetworkVector inputvector = new NeuralNet.NetworkVector(new double[] { 1, 0, 0 });
-            network.Run(inputvector);
+            NetworkVector result = network.Run(inputvector);
 
             NeuralNet.NetworkVector outputCheck = new NeuralNet.NetworkVector(new double[] { 2 });
-            Assert.AreEqual(outputCheck, network.Output);
+            Assert.AreEqual(outputCheck, result);
         }
 
         [TestMethod]

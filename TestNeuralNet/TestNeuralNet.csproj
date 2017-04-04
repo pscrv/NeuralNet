@@ -67,6 +67,7 @@
     <Compile Include="TestTrainingCollection.cs" />
     <Compile Include="TrainerTests.cs" />
     <Compile Include="UnitNetworkVectorTests.cs" />
+    <Compile Include="VectorBatchTests.cs" />
     <Compile Include="VectorTests.cs" />
     <Compile Include="WeightedCombinerTests.cs" />
     <Compile Include="WeightedCombinerBankTests.cs" />

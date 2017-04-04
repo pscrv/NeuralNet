@@ -8,10 +8,11 @@ namespace NeuralNet
 {
     public interface ITrainable
     {
-        void Run(NetworkVector input);
-        NetworkVector Output { get; }
+        NetworkVector Run(NetworkVector input);
+        VectorBatch Run(VectorBatch inputs);
 
         void BackPropagate(NetworkVector outputgradient);
+        void BackPropagate(VectorBatch outputgradients);
         void Update(AdaptationStrategy strategy);
     }
 }

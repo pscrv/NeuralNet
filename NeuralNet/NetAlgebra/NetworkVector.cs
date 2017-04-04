@@ -2,15 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-
 
 using MathNet.Numerics.LinearAlgebra;
 
 namespace NeuralNet
 {
-   
-
     public class NetworkVector : IEquatable<NetworkVector>
     {
         #region delegates
@@ -56,12 +52,12 @@ namespace NeuralNet
         #region static methods
         public static NetworkVector Sum(IEnumerable<NetworkVector> vectors)
         {
-            return new NetworkVector( vectors.Select(x => x._vector).Aggregate((x, y) => x + y) );
+            return new NetworkVector(vectors.Select(x => x._vector).Aggregate((x, y) => x + y));
         }
 
         public static NetworkVector ApplyFunctionComponentWise(NetworkVector vector, SingleVariableFunction fctn)
         {
-            return new NetworkVector( vector._vector.Select(x => fctn(x)) );            
+            return new NetworkVector(vector._vector.Select(x => fctn(x)));
         }
 
         public static NetworkVector ApplyFunctionComponentWise(NetworkVector vector1, NetworkVector vector2, TwoVariableFunction fctn)
@@ -83,6 +79,7 @@ namespace NeuralNet
                 Array.Copy(vector._vector.ToArray(), 0, resultVector, index, vector.Dimension);
                 index += vector.Dimension;
             }
+
             return new NetworkVector(resultVector);
         }
         #endregion
@@ -112,10 +109,15 @@ namespace NeuralNet
 
         public NetworkVector SumWith(NetworkVector other)
         {
-            return new NetworkVector( _vector.Add(other._vector));
+            return new NetworkVector(_vector.Add(other._vector));
+        }
+        
+        public double DotProduct(NetworkVector other)
+        {
+            return _vector.DotProduct(other._vector);
         }
 
-        public WeightsMatrix LeftMultiply(NetworkVector other)
+        public WeightsMatrix OuterProduct(NetworkVector other)
         {
             return new WeightsMatrix(_vector.OuterProduct(other._vector));
         }
@@ -148,22 +150,26 @@ namespace NeuralNet
         {
             return new NetworkVector(_vector);
         }
-
-
+        
         public double SumValues()
         {
             return _vector.Sum();
         }
 
-        public double DotProduct(NetworkVector other)
-        {
-            return _vector.DotProduct(other._vector);
-        }
-
-
         public double[] ToArray()
         {
             return _vector.ToArray();
+        }
+
+        public VectorBatch AsVectorBatch()
+        {
+            return new VectorBatch(this);
+        }
+
+        public Matrix<double> AsMatrix()
+        {
+            Matrix<double> result = Matrix<double>.Build.DenseOfRowVectors(_vector);
+            return result;
         }
         #endregion
 
@@ -236,14 +242,14 @@ namespace NeuralNet
     }
 
 
-    public class UnitNetworkVector : NetworkVector
-    {
-        public UnitNetworkVector(int index, int dimension)
-        {
-            _vector = Vector<double>.Build.Sparse(dimension);
-            _vector[index] = 1.0;
-        }
-    }
+    //public class UnitNetworkVector : NetworkVector
+    //{
+    //    public UnitNetworkVector(int index, int dimension)
+    //    {
+    //        _vector = Vector<double>.Build.Sparse(dimension);
+    //        _vector[index] = 1.0;
+    //    }
+    //}
     
     
 }

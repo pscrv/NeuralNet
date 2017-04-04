@@ -35,8 +35,7 @@ namespace NeuralNet
 
         protected NetworkVector _getErrorGradient(VectorPair tv)
         {
-            _network.Run(tv.First);
-            NetworkVector gradient = _network.Output.Copy();
+            NetworkVector gradient = _network.Run(tv.First);
             gradient.Subtract(tv.Second);
             return gradient;
         }

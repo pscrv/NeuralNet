@@ -18,10 +18,13 @@ namespace NeuralNet
             return output * (1 - output);
         }
 
+
         #region protected attributes
         protected int _numberOfUnits;
-        protected NetworkVector _input;
-        protected NetworkVector _output;
+        protected NetworkVector _inputVector;
+        protected VectorBatch _inputBatch;
+        protected NetworkVector _outputVector;
+        protected VectorBatch _outputBatch;
         protected ActivationFunction _neuralFunction;
         protected DerivativeFunction _neuralFunctionDerivative;
         #endregion
@@ -29,23 +32,45 @@ namespace NeuralNet
         #region NetworkComponent overrides
         public override int NumberOfInputs { get { return _numberOfUnits; } }
         public override int NumberOfOutputs { get { return _numberOfUnits; } }
-        public override NetworkVector Input { get { return _input; } set { _input = value; } }
-        public override NetworkVector Output { get { return _output; } protected set { _output = value; } }
 
 
-        public override void Run(NetworkVector inputvalues)
+        public override NetworkVector Run(NetworkVector inputvalues)
         {
-            Input = inputvalues;
+            _inputVector = inputvalues;
+            _inputBatch = null;
+            _outputBatch = null;
+
             if (_neuralFunction != null)
             {
-                Output =  NetworkVector.ApplyFunctionComponentWise(Input, x => _neuralFunction(x));
+                _outputVector =  NetworkVector.ApplyFunctionComponentWise(inputvalues.Copy(), x => _neuralFunction(x));
             }
             else
             {
-                Output = Input.Copy();
+                _outputVector = inputvalues.Copy();
             }
+
+            return _outputVector;
         }
-        
+
+        public override VectorBatch Run(VectorBatch inputbatch)
+        {
+            _inputVector = null;
+            _inputBatch = inputbatch;
+            _outputVector = null;
+
+            if (_neuralFunction != null)
+            {
+                _outputBatch = new VectorBatch( inputbatch.AsMatrix().Map(x => _neuralFunction(x)) );
+            }
+            else
+            {
+                _outputBatch = inputbatch;
+            }
+
+            return _outputBatch;
+        }
+
+
         public override NetworkVector InputGradient(NetworkVector outputgradient)
         {
             if (outputgradient == null || outputgradient.Dimension != NumberOfOutputs)
@@ -53,23 +78,44 @@ namespace NeuralNet
 
             if (_neuralFunctionDerivative == null)
                 return outputgradient.Copy();
-            return NetworkVector.ApplyFunctionComponentWise(Input, Output, (x, y) => _neuralFunctionDerivative(x, y));
-            
-        }       
-        #endregion
+            return NetworkVector.ApplyFunctionComponentWise(_inputVector, _outputVector, (x, y) => _neuralFunctionDerivative(x, y));            
+        }
 
-        #region public properties
-        public NetworkVector Activations { get; protected set; }
+        public NetworkVector InputGradient(NetworkVector outputgradient, NetworkVector input, NetworkVector output)
+        {
+            if (outputgradient == null || outputgradient.Dimension != NumberOfOutputs)
+                throw new ArgumentException("outputgradient may not be null and must have dimension equal to NumberOfNeurons.");
+
+            if (_neuralFunctionDerivative == null)
+                return outputgradient.Copy();
+
+            return NetworkVector.ApplyFunctionComponentWise(input, output, (x, y) => _neuralFunctionDerivative(x, y));
+        }
+
+        public override VectorBatch InputGradient(VectorBatch outputgradient)
+        {
+            if (outputgradient == null || outputgradient.Dimension != NumberOfOutputs)
+                throw new ArgumentException("outputgradient may not be null and must have dimension equal to NumberOfNeurons.");
+
+            if (_neuralFunctionDerivative == null)
+                return outputgradient;
+
+            return new VectorBatch(
+                _inputBatch.AsMatrix().Map2((x, y) => _neuralFunctionDerivative(x, y), _outputBatch.AsMatrix())
+                );
+
+        }
         #endregion
+        
 
         #region Constructors
         public NeuralFunction(int numberofunits)
         {
             _numberOfUnits = numberofunits;
             _neuralFunction = null;
-            _input = new NetworkVector(numberofunits);
-            _output = new NetworkVector(numberofunits);
-            Activations = new NetworkVector(numberofunits);
+            _inputVector = new NetworkVector(numberofunits);
+            _inputBatch = null;
+            _outputVector = new NetworkVector(numberofunits);
         }
 
         public NeuralFunction(int numberOfUnits, ActivationFunction activationfunction, DerivativeFunction derivativefunction, double[] biases = null)

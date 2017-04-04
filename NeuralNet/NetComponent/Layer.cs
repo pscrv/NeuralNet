@@ -38,32 +38,15 @@ namespace NeuralNet
         #region NetComponent overrides
         public override int NumberOfInputs { get { return _combiner.NumberOfInputs; } }
         public override int NumberOfOutputs { get { return _combiner.NumberOfOutputs; } }
-        public override NetworkVector Input { get { return _combiner.Input; } set { _combiner.Input = value; } }
-        public override NetworkVector Output { 
-            get
-            {
-                if (_neuralFunction == null)
-                    return _combiner.Output;
-
-                return _neuralFunction.Output;
-            }
-
-            protected set { }
-        }
-
+        
         public override NetworkVector InputGradient(NetworkVector outputgradient)
         {
             return _combiner.InputGradient(ActivationGradient(outputgradient));
         }
-        
-        public override void Run(NetworkVector inputvalues)
-        {
-            if (inputvalues.Dimension != NumberOfInputs)
-                throw new ArgumentException("Input dimension does not match this Layer.");
 
-            _combiner.Run(inputvalues);
-            if (_neuralFunction != null)
-                _neuralFunction.Run(_combiner.Output);
+        public override VectorBatch InputGradient(VectorBatch outputgradients)
+        {
+            return _combiner.InputGradient(ActivationGradient(outputgradients));
         }
         #endregion
 
@@ -76,10 +59,25 @@ namespace NeuralNet
             return _combiner.BiasesGradient(ActivationGradient(outputgradient));
         }
 
+        public NetworkVector BiasesGradient(VectorBatch outputgradient)
+        {
+            return _combiner.BiasesGradient(ActivationGradient(outputgradient));
+        }
+
         public override WeightsMatrix WeightsGradient(NetworkVector outputgradient)
         {
             return _combiner.WeightsGradient(ActivationGradient(outputgradient));
-        }      
+        }
+
+        public WeightsMatrix WeightsGradient(NetworkVector outputgradient, NetworkVector input)
+        {
+            return _combiner.WeightsGradient(ActivationGradient(outputgradient), input);
+        }
+
+        public WeightsMatrix WeightsGradient(VectorBatch outputgradient, VectorBatch input)
+        {
+            return _combiner.WeightsGradient(ActivationGradient(outputgradient), input);
+        }
 
         public override void Update(AdaptationStrategy strategy)
         {
@@ -91,8 +89,49 @@ namespace NeuralNet
 
         public override void BackPropagate(NetworkVector outputgradient)
         {
+            BackPropagate(outputgradient, VectorInput);
+        }
+
+        public override void BackPropagate(NetworkVector outputgradient, NetworkVector input)
+        {
             _biasesGradientAccumulator.Add(BiasesGradient(outputgradient));
-            _weightsGradientAccumulator.Add(WeightsGradient(outputgradient));
+            _weightsGradientAccumulator.Add(WeightsGradient(outputgradient, input));
+        }
+
+        public override void BackPropagate(VectorBatch outputgradient)
+        {
+            BackPropagate(outputgradient, BatchInput);
+        }
+
+        public override void BackPropagate(VectorBatch outputgradient, VectorBatch input)
+        {
+            _biasesGradientAccumulator.Add(BiasesGradient(outputgradient));
+            _weightsGradientAccumulator.Add(WeightsGradient(outputgradient, input));
+        }
+
+
+        protected override NetworkVector _run(NetworkVector inputvalues)
+        {
+            if (inputvalues.Dimension != NumberOfInputs)
+                throw new ArgumentException("Input dimension does not match this Layer.");
+
+            NetworkVector result = _combiner.Run(inputvalues);
+            if (_neuralFunction != null)
+                result = _neuralFunction.Run(result);
+
+            return result;
+        }
+
+        protected override VectorBatch _run(VectorBatch inputbatch)
+        {
+            if (inputbatch.Dimension != NumberOfInputs)
+                throw new ArgumentException("Input dimension does not match this Layer.");
+
+            VectorBatch result = _combiner.Run(inputbatch);
+            if (_neuralFunction != null)
+                result = _neuralFunction.Run(result);
+
+            return result;
         }
         #endregion
 
@@ -136,6 +175,13 @@ namespace NeuralNet
 
         #region public methods
         public NetworkVector ActivationGradient(NetworkVector outputgradient)
+        {
+            if (_neuralFunction == null)
+                return outputgradient;
+            return _neuralFunction.InputGradient(outputgradient);
+        }
+
+        public VectorBatch ActivationGradient(VectorBatch outputgradient)
         {
             if (_neuralFunction == null)
                 return outputgradient;

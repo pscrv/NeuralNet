@@ -36,8 +36,6 @@ namespace NeuralNet
             foreach (VectorPair tv in trainingdata)
             {
                 _runAndBackPropagate(tv);
-                //errorGradient = _getErrorGradient(tv);
-                //_component.BackPropagate(errorGradient);
             }
             _component.Update(_strategy);
         }
@@ -51,26 +49,37 @@ namespace NeuralNet
                 tv =>
                 {
                     _runAndBackPropagate(tv);
-                    //errorGradient = _getErrorGradient(tv);
-                    //_component.BackPropagate(errorGradient);
                 }
                 );
             _component.Update(_strategy);
         }
 
-        #region protected methods
 
-        protected NetworkVector _getErrorGradient(VectorPair tv)
+        public void Train(TrainingBatchCollection trainingdata)
         {
-            _component.Run(tv.First);
-            return _costFunction.Gradient(tv.Second, _component.Output);
+
+            _costAccumulator = 0;
+            foreach (BatchPair tv in trainingdata)
+            {
+                _runAndBackPropagate(tv);
+            }
+            _component.Update(_strategy);
         }
+
+        #region protected methods        
 
         protected void _runAndBackPropagate(VectorPair tv)
         {
-            _component.Run(tv.First);
-            _costAccumulator += _costFunction.Cost(tv.Second, _component.Output);
-            _component.BackPropagate(_costFunction.Gradient(tv.Second, _component.Output));
+            NetworkVector result = _component.Run(tv.First);
+            _costAccumulator += _costFunction.Cost(tv.Second, result);
+            _component.BackPropagate(_costFunction.Gradient(tv.Second, result));
+        }
+
+        protected void _runAndBackPropagate(BatchPair tv)
+        {
+            VectorBatch result = _component.Run(tv.First);
+            _costAccumulator += _costFunction.Cost(tv.Second, result);
+            _component.BackPropagate(_costFunction.Gradient(tv.Second, result));
         }
         #endregion
     }

@@ -4,6 +4,7 @@ using Accord.IO;
 using NeuralNet;
 using System.IO;
 using System;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace FourthWord
 {
@@ -30,18 +31,23 @@ namespace FourthWord
             }
         }
         #endregion
-        public IEnumerable<VectorPair> TrainingData { get { return _arrayToPairs(_trainingArray); } }
-        public IEnumerable<VectorPair> ValidationData { get { return _arrayToPairs(_validationArray); } }
-        public IEnumerable<VectorPair> TestData { get { return _arrayToPairs(_testArray); } }
+        public IEnumerable<VectorPair> TrainingData { get { return _arrayToVectorPairs(_trainingArray); } }
+        public IEnumerable<VectorPair> ValidationData { get { return _arrayToVectorPairs(_validationArray); } }
+        public IEnumerable<VectorPair> TestData { get { return _arrayToVectorPairs(_testArray); } }
 
         public TrainingCollection TrainingDataCollection { get { return new TrainingCollection(TrainingData); } }
         public TrainingCollection ValidationDataCollection { get { return new TrainingCollection(ValidationData); } }
         public TrainingCollection TestDataCollection { get { return new TrainingCollection(TestData); } }
+
+        public TrainingBatchCollection TrainingBatchDataCollection(int batchsize)
+        {
+            return new TrainingBatchCollection( _arrayToBatchPairs(_trainingArray, batchsize) ); 
+        }
         #region public methods
         #endregion
 
         #region private methods
-        private IEnumerable<VectorPair> _arrayToPairs(int[,] array)
+        private IEnumerable<VectorPair> _arrayToVectorPairs(int[,] array)
         {
             int nGramCount = array.GetLength(1);
             int lengthMinus1 = array.GetLength(0) - 1;
@@ -63,23 +69,34 @@ namespace FourthWord
                 Array.Clear(outputVector, 0, outputVector.Length);
             }
         }
-
-        private IEnumerable<VectorPair> _arrayToPairs2(int[,] array)
+        private IEnumerable<BatchPair> _arrayToBatchPairs(int[,] array, int batchsize)
         {
             int nGramCount = array.GetLength(1);
             int lengthMinus1 = array.GetLength(0) - 1;
+            int inputVectorDimension = lengthMinus1 * _vocabularySize;
 
-            //TODO: working here
+            Matrix<double> inputBatch = Matrix<double>.Build.Dense(batchsize, inputVectorDimension);
+            Matrix<double> outputBatch = Matrix<double>.Build.Dense(batchsize, _vocabularySize);
+            
+            int count = 0;
+            int batchcount = 0;
             for (int i = 0; i < nGramCount; i++)
             {
-                Vector inputWord1 = new UnitVector(array[0, i], _vocabularySize);
-                Vector inputWord2 = new UnitVector(array[2, i], _vocabularySize);
-                Vector inputWord3 = new UnitVector(array[3, i], _vocabularySize);
-                Vector outputWord1 = new UnitVector(array[4, i], _vocabularySize);
-                yield return new VectorPair(new NetworkVector(inputWord1.ToArray()), new NetworkVector(outputWord1.ToArray()));
-            }
+                for (int j = 0; j < lengthMinus1; j++)
+                {
+                    inputBatch[i - (batchcount * batchsize), j * _vocabularySize + array[j, i] - 1] = 1;
+                }
 
-            
+                outputBatch[i - (batchcount * batchsize), array[lengthMinus1, i] - 1] = 1;
+
+                count++;
+                if (count == batchsize)
+                {
+                    batchcount++;
+                    count = 0;
+                    yield return new BatchPair(new VectorBatch(inputBatch), new VectorBatch(outputBatch));
+                }
+            }
         }
 
         #endregion

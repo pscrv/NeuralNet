@@ -51,53 +51,50 @@ namespace TestNeuralNet
         [TestMethod]
         public void CanRun()
         {
-            nf_1.Run(vector_1);
-            Assert.AreEqual(vector_1, nf_1.Output);
+            NetworkVector result = nf_1.Run(vector_1);
+            Assert.AreEqual(vector_1, result);
         }
 
         [TestMethod]
         public void CanRunLinear()
         {
-            nf_linear.Run(vector_2);
-            Assert.AreEqual(vector_2, nf_linear.Output);
+            NetworkVector result = nf_linear.Run(vector_2);
+            Assert.AreEqual(vector_2, result);
         }
 
         [TestMethod]
         public void CanRunSigmoid()
         {
-            nf_sigmoid.Run(vector_2);
+            NetworkVector result = nf_sigmoid.Run(vector_2);
             NetworkVector outputCheck = new NetworkVector(new double[] { sigmoid(1), sigmoid(2) });
-            Assert.AreEqual(outputCheck, nf_sigmoid.Output);
+            Assert.AreEqual(outputCheck, result);
         }
 
         [TestMethod]
         public void CanBack()
         {
             nf_1.Run(vector_1);
-            //nf_1.Back(vector_1);
             Assert.AreEqual(vector_1, nf_1.InputGradient(vector_1));
         }
 
         [TestMethod]
         public void CanBackLinear()
         {
-            nf_linear.Run(vector_2);
-            //nf_linear.Back(vector_2);
+            NetworkVector result = nf_linear.Run(vector_2);
             NetworkVector inputgradienttest = new NetworkVector(new double[] { 1, 1 });
-            Assert.AreEqual(inputgradienttest, nf_linear.InputGradient(vector_2));
+            Assert.AreEqual(inputgradienttest, nf_linear.InputGradient(vector_2, vector_2, result));
         }
 
         [TestMethod]
         public void CanBackSigmoid()
         {
-            nf_sigmoid.Run(vector_2);
-            //nf_sigmoid.Back(vector_2);
-            double[] outarray = nf_sigmoid.Output.ToArray();
+            NetworkVector result = nf_sigmoid.Run(vector_2);
+            double[] outarray = result.ToArray();
             double[] inarray = vector_2.ToArray();
-            NetworkVector outputCheck = new NetworkVector(
+            NetworkVector gradientCheck = new NetworkVector(
                 new double[] { sigmoidDerivative(inarray[0], outarray[0]),
                     sigmoidDerivative(inarray[1], outarray[1]) });
-            Assert.AreEqual(outputCheck, nf_sigmoid.InputGradient(vector_2));
+            Assert.AreEqual(gradientCheck, nf_sigmoid.InputGradient(vector_2, vector_2, result));
         }
     }
 }

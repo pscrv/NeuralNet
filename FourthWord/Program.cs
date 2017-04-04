@@ -21,10 +21,9 @@ namespace FourthWord
             TimeSpan totalElapsed = new TimeSpan();
             sw.Start();
             int count = 0;
-            foreach (TrainingCollection batch in reader.TrainingDataCollection.AsBatches(100))
-            {
-                VectorPair[] x = batch.ToArray();
-
+            //foreach (TrainingCollection batch in reader.TrainingDataCollection.AsBatches(100))
+                foreach (TrainingBatchCollection batch in reader.TrainingBatchDataCollection(100).AsSingletons())
+                {
                 //trainer.ParallelTrain(batch);
                 trainer.Train(batch);
                 totalElapsed = sw.Elapsed;

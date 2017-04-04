@@ -39,8 +39,6 @@ namespace NeuralNet
         #region NetComponent overrides
         public override int NumberOfInputs { get { return _head.Component.NumberOfInputs; } }
         public override int NumberOfOutputs { get { return _tail.Component.NumberOfOutputs; } }
-        public override NetworkVector Input { get { return _head.Component.Input; } set { } }
-        public override NetworkVector Output { get { return _tail.Component.Output; } protected set { } }
 
         public override NetworkVector InputGradient(NetworkVector outputgradient)
         {
@@ -57,7 +55,58 @@ namespace NeuralNet
             }
 
             return gradient;
-        }        
+        }
+
+        public override VectorBatch InputGradient(VectorBatch outputgradients)
+        {
+            if (NumberOfComponents == 0)
+                throw new InvalidOperationException("Attempt to back propogate in a network with no layers.");
+
+            if (outputgradients.Dimension != _tail.Component.NumberOfOutputs)
+                throw new ArgumentException(string.Format("The network has {0} outputs, but outputgradient has dimension {1}", _tail.Component.NumberOfOutputs, outputgradients.Dimension));
+
+            VectorBatch gradient = outputgradients;
+            foreach (NetComponent component in BackwardsEnumeration)
+            {
+                gradient = component.InputGradient(gradient);
+            }
+
+            return gradient;
+        }
+
+        public override NetworkVector Run(NetworkVector input)
+        {
+            if (NumberOfComponents == 0)
+                throw new InvalidOperationException("Attempt to run a network with no layers.");
+
+            if (input.Dimension != NumberOfInputs)
+                throw new ArgumentException(string.Format("The network accepts {0} inputs, but input has dimension {1}", NumberOfInputs, input.Dimension));
+
+            NetworkVector result = input;
+            foreach (NetComponent component in ForwardEnumeration)
+            {
+                result = component.Run(result);
+            }
+
+            return result;
+        }
+
+        public override VectorBatch Run(VectorBatch inputbatch)
+        {
+            if (NumberOfComponents == 0)
+                throw new InvalidOperationException("Attempt to run a network with no layers.");
+
+            if (inputbatch.Dimension != NumberOfInputs)
+                throw new ArgumentException(string.Format("The network accepts {0} inputs, but input has dimension {1}", NumberOfInputs, inputbatch.Dimension));
+
+            VectorBatch result = inputbatch;
+            foreach (NetComponent component in ForwardEnumeration)
+            {
+                result = component.Run(result);
+            }
+
+            return result;
+        }
         #endregion
 
 
@@ -94,20 +143,6 @@ namespace NeuralNet
             _addComponent(componentToAdd, istrainable: true);
         }
 
-        public override void Run(NetworkVector input)
-        {
-            if (NumberOfComponents == 0)
-                throw new InvalidOperationException("Attempt to run a network with no layers.");
-
-            if (input.Dimension != NumberOfInputs)
-                throw new ArgumentException(string.Format("The network accepts {0} inputs, but input has dimension {1}", NumberOfInputs, input.Dimension));
-
-            foreach (NetComponent component in ForwardEnumeration)
-            {
-                component.Run(input);
-                input = component.Output;
-            }
-        }
         #endregion
 
 
@@ -147,6 +182,28 @@ namespace NeuralNet
         {
             NetworkVector currentGradient = outputgradient.Copy();
             NetComponent currentComponent;
+
+            _networkComponentNode node = _tail;
+            {
+                while (node != null)
+                {
+                    currentComponent = node.Component;
+                    if (node.IsTrainable)
+                    {
+                        (currentComponent as TrainableComponent).BackPropagate(currentGradient);
+                    }
+
+                    currentGradient = currentComponent.InputGradient(currentGradient);
+                    node = node.Previous;
+                }
+            }
+        }
+
+        public void BackPropagate(VectorBatch outputgradients)
+        {
+            VectorBatch currentGradient = outputgradients;
+            NetComponent currentComponent;
+
             _networkComponentNode node = _tail;
             {
                 while (node != null)
@@ -235,7 +292,7 @@ namespace NeuralNet
 
 
 
-        #region protected subclass of LayerListNode
+        #region protected internal of LayerListNode
         protected class _networkComponentNode
         {
             public NetComponent Component { get; protected set; }

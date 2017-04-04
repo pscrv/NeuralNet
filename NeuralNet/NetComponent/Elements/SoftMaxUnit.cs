@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MathNet.Numerics.LinearAlgebra;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,15 +19,31 @@ namespace NeuralNet
         #region NetComponent overrides
         public override int NumberOfInputs { get { return _numberOfUnits; } }
         public override int NumberOfOutputs { get { return _numberOfUnits; } }
-        public override NetworkVector Input { get { return _input; } set { _input = value; } }
-        public override NetworkVector Output { get { return _output; } protected set { _output = value; } }
 
         public override NetworkVector InputGradient(NetworkVector outputgradient)
         {
             if (outputgradient == null || outputgradient.Dimension != NumberOfOutputs)
                 throw new ArgumentException("outputgradient may not be null and must have dimension equal to the number of units.");
 
-            return NetworkVector.ApplyFunctionComponentWise(Output, outputgradient, (x, y) => x * (1 - x) * y);
+            return NetworkVector.ApplyFunctionComponentWise(_output, outputgradient, (x, y) => x * (1 - x) * y);
+        }
+
+        public NetworkVector InputGradient(NetworkVector outputgradient, NetworkVector output)
+        {
+            if (outputgradient == null || outputgradient.Dimension != NumberOfOutputs)
+                throw new ArgumentException("outputgradient may not be null and must have dimension equal to the number of units.");
+
+            return NetworkVector.ApplyFunctionComponentWise(output, outputgradient, (x, y) => x * (1 - x) * y);
+        }
+
+        public override VectorBatch InputGradient(VectorBatch outputgradients)
+        {
+            if (outputgradients == null || outputgradients.Dimension != NumberOfOutputs)
+                throw new ArgumentException("outputgradient may not be null and must have dimension equal to the number of units.");
+
+            return new VectorBatch(
+                (_output.AsMatrix().Map2((x, y) => x * (1 - x) * y, outputgradients.AsMatrix()))
+                );
         }
         #endregion
 
@@ -47,20 +64,37 @@ namespace NeuralNet
         #endregion
 
         #region public methods
-        // Should subtract max input from all inputs
-        // Subraction of a constant does not affect the output
-        // but it will affect the exponential  - keep the oututs smallish.
-        public override void Run(NetworkVector inputvalues)
+        public override NetworkVector Run(NetworkVector inputvalues)
         {
             if (inputvalues == null || inputvalues.Dimension != _numberOfUnits)
                 throw new ArgumentException("inputvalues may not be null and must have dimension equal to the number of units.");
             
-            Input = inputvalues;
 
-            NetworkVector intermediateVector = NetworkVector.ApplyFunctionComponentWise(Input, x => Math.Exp(x));
+            double max = inputvalues.Vector.Max();
+            NetworkVector intermediateVector = NetworkVector.ApplyFunctionComponentWise(inputvalues.Copy(), x => Math.Exp(x - max));
 
             double sum = intermediateVector.SumValues();
-            Output = NetworkVector.ApplyFunctionComponentWise(intermediateVector, x => x / sum);
+            return NetworkVector.ApplyFunctionComponentWise(intermediateVector, x => x / sum);
+        }
+
+        public override VectorBatch Run(VectorBatch inputbatch)
+        {
+            if (inputbatch == null || inputbatch.Dimension != _numberOfUnits)
+                throw new ArgumentException("inputvalues may not be null and must have dimension equal to the number of units.");
+
+            double max;
+            double sum;
+            Matrix<double> result = Matrix<double>.Build.DenseOfMatrix(inputbatch.AsMatrix());
+            foreach (Vector<double> row in result.EnumerateRows())
+            {
+                max = row.Max();
+                row.Map(x => Math.Exp(x - max));
+
+                sum = row.Sum();
+                row.Map(x => x / sum);
+            }
+
+            return new VectorBatch(result);
         }
         #endregion
     }

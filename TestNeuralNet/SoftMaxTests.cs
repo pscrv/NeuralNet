@@ -31,16 +31,16 @@ namespace TestNeuralNet
             Assert.AreEqual(testvalue, smu.NumberOfOutputs);
         }
 
-        [TestMethod]
-        public void UnrunSoftMaxHasZeroOutput()
-        {
-            SoftMaxUnit smu = new SoftMaxUnit(7);
-            double[] outputvalues = smu.Output.ToArray();
-            for (int i = 0; i < smu.NumberOfOutputs; i++)
-            {
-                Assert.AreEqual(0, outputvalues[i]);
-            }
-        }
+        //[TestMethod]
+        //public void UnrunSoftMaxHasZeroOutput()
+        //{
+        //    SoftMaxUnit smu = new SoftMaxUnit(7);
+        //    double[] outputvalues = smu.Output.ToArray();
+        //    for (int i = 0; i < smu.NumberOfOutputs; i++)
+        //    {
+        //        Assert.AreEqual(0, outputvalues[i]);
+        //    }
+        //}
 
         [TestMethod]
         public void CannotRunWithWrongSizedInput()
@@ -60,17 +60,17 @@ namespace TestNeuralNet
         public void RunProducesCorrectOutput()
         {
             SoftMaxUnit smu = new SoftMaxUnit(7);
-            NetworkVector inputs = new NetworkVector(new double[] { 1, 0, 0, 0, 0, 0, 1 });
+            NetworkVector input = new NetworkVector(new double[] { 1, 0, 0, 0, 0, 0, 1 });
 
-            smu.Run(inputs);
+            NetworkVector output = smu.Run(input);
 
             double sum = 5 + (2 * Math.E);
             double one_value = Math.E / sum;
             double zero_value = 1 / sum;
             double delta = 0.000000001;
 
-            double[] outputvalues = smu.Output.ToArray();
-            double outputvaluessum = smu.Output.SumValues();
+            double[] outputvalues = output.ToArray();
+            double outputvaluessum = output.SumValues();
             Assert.AreEqual(1.0, outputvaluessum, delta);
             Assert.AreEqual(one_value, outputvalues[0], delta);
             Assert.AreEqual(one_value, outputvalues[6], delta);
@@ -103,8 +103,8 @@ namespace TestNeuralNet
             NetworkVector inputs = new NetworkVector(new double[] { 0, 1, 0, 0, 1, 0, 0 });
             NetworkVector outputgradient = new NetworkVector(new double[] { 1, 1, 0, 0, 0, 0, 0 });
 
-            smu.Run(inputs);
-            NetworkVector inputGradient =  smu.InputGradient(outputgradient);
+            NetworkVector output = smu.Run(inputs);
+            NetworkVector inputGradient =  smu.InputGradient(outputgradient, output);
 
             double sum = 5 + (2 * Math.E);
             double one_value = Math.E / sum;

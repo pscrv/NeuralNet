@@ -19,17 +19,17 @@ namespace TestNeuralNet
             Assert.AreNotEqual(null, network);
         }
 
-        [TestMethod]
-        public void UnrunSmallNetworkHasZeroOutput()
-        {
-            int inputs = 3;
-            int inputneurons = 2;
-            int outputneurons = 1;
+        //[TestMethod]
+        //public void UnrunSmallNetworkHasZeroOutput()
+        //{
+        //    int inputs = 3;
+        //    int inputneurons = 2;
+        //    int outputneurons = 1;
 
-            LinearTwoLayerTestNetwork network = new LinearTwoLayerTestNetwork(inputs, inputneurons, outputneurons);
-            double output = network.Output.ToArray()[0];
-            Assert.AreEqual(0, output);
-        }
+        //    LinearTwoLayerTestNetwork network = new LinearTwoLayerTestNetwork(inputs, inputneurons, outputneurons);
+        //    double output = network.Output.ToArray()[0];
+        //    Assert.AreEqual(0, output);
+        //}
 
         [TestMethod]
         public void CanRunSmallNetWithZeroInput()
@@ -40,9 +40,8 @@ namespace TestNeuralNet
             NetworkVector inputvector = new NetworkVector(3);
 
             LinearTwoLayerTestNetwork network = new LinearTwoLayerTestNetwork(inputs, inputneurons, outputneurons);
-            network.Run(inputvector);
-
-            double output = network.Output.ToArray()[0];
+            
+            double output = network.Run(inputvector).ToArray()[0];
             Assert.AreEqual(0, output);
         }
 
@@ -55,9 +54,8 @@ namespace TestNeuralNet
             NetworkVector inputvector = new NetworkVector(new double[] { 1, 0, 0 });
 
             LinearTwoLayerTestNetwork network = new LinearTwoLayerTestNetwork(inputs, inputneurons, outputneurons);
-            network.Run(inputvector);
-
-            double output = network.Output.ToArray()[0];
+            
+            double output = network.Run(inputvector).ToArray()[0];
             Assert.AreEqual(2, output);
         }
 
@@ -70,9 +68,8 @@ namespace TestNeuralNet
             NetworkVector inputvector = new NetworkVector(new double[] { 0, 1, 1 });
 
             LinearTwoLayerTestNetwork network = new LinearTwoLayerTestNetwork(inputs, inputneurons, outputneurons);
-            network.Run(inputvector);
-
-            double output = network.Output.ToArray()[0];
+            
+            double output = network.Run(inputvector).ToArray()[0];
             Assert.AreEqual(4, output);
         }
 
@@ -85,9 +82,8 @@ namespace TestNeuralNet
             NetworkVector inputvector = new NetworkVector(new double[] { 1, 1, 1 });
 
             LinearTwoLayerTestNetwork network = new LinearTwoLayerTestNetwork(inputs, inputneurons, outputneurons);
-            network.Run(inputvector);
-
-            double output = network.Output.ToArray()[0];
+            
+            double output = network.Run(inputvector).ToArray()[0];
             Assert.AreEqual(6, output);
         }
 
@@ -242,17 +238,17 @@ namespace TestNeuralNet
             Assert.AreNotEqual(null, network);
         }
 
-        [TestMethod]
-        public void UnrunBigNetworkHasZeroOutput()
-        {
-            int inputs = 100;
-            int inputneurons = 2000;
-            int outputneurons = 1;
+        //[TestMethod]
+        //public void UnrunBigNetworkHasZeroOutput()
+        //{
+        //    int inputs = 100;
+        //    int inputneurons = 2000;
+        //    int outputneurons = 1;
 
-            LinearTwoLayerTestNetwork network = new LinearTwoLayerTestNetwork(inputs, inputneurons, outputneurons);
-            double output = network.Output.ToArray()[0];
-            Assert.AreEqual(0, output);
-        }
+        //    LinearTwoLayerTestNetwork network = new LinearTwoLayerTestNetwork(inputs, inputneurons, outputneurons);
+        //    double output = network.Output.ToArray()[0];
+        //    Assert.AreEqual(0, output);
+        //}
 
         [TestMethod]
         public void CanRunBigNetWithZeroInput()
@@ -263,9 +259,8 @@ namespace TestNeuralNet
             NetworkVector inputvector = new NetworkVector(100);
 
             LinearTwoLayerTestNetwork network = new LinearTwoLayerTestNetwork(inputs, inputneurons, outputneurons);
-            network.Run(inputvector);
-
-            double output = network.Output.ToArray()[0];
+            
+            double output = network.Run(inputvector).ToArray()[0];
             Assert.AreEqual(0, output);
         }
 
@@ -280,9 +275,8 @@ namespace TestNeuralNet
             NetworkVector inputvector = new NetworkVector(inputArray);
 
             LinearTwoLayerTestNetwork network = new LinearTwoLayerTestNetwork(inputs, inputneurons, outputneurons);
-            network.Run(inputvector);
-
-            double output = network.Output.ToArray()[0];
+            
+            double output = network.Run(inputvector).ToArray()[0];
             Assert.AreEqual(2000, output);
         }
                 
@@ -298,9 +292,8 @@ namespace TestNeuralNet
             NetworkVector inputvector = new NetworkVector(inputArray);
 
             LinearTwoLayerTestNetwork network = new LinearTwoLayerTestNetwork(inputs, inputneurons, outputneurons);
-            network.Run(inputvector);
-
-            double output = network.Output.ToArray()[0];
+            
+            double output = network.Run(inputvector).ToArray()[0];
             Assert.AreEqual(4000, output);
         }
 
@@ -317,9 +310,8 @@ namespace TestNeuralNet
             NetworkVector inputvector = new NetworkVector(inputArray);
 
             LinearTwoLayerTestNetwork network = new LinearTwoLayerTestNetwork(inputs, inputneurons, outputneurons);
-            network.Run(inputvector);
-
-            double output = network.Output.ToArray()[0];
+            
+            double output = network.Run(inputvector).ToArray()[0];
             Assert.AreEqual(6000, output);
         }
 

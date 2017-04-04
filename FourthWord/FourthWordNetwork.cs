@@ -14,7 +14,7 @@ namespace FourthWord
         private TrainableComponent _embeddingLayer;
         private TrainableComponent _hiddenLayer;
         private TrainableComponent _outputLayer;
-        private NetComponent _softMaxLayer;
+        //private NetComponent _softMaxLayer;
         #endregion
 
         #region constructors
