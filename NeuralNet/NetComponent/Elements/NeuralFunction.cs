@@ -78,7 +78,12 @@ namespace NeuralNet
 
             if (_neuralFunctionDerivative == null)
                 return outputgradient.Copy();
-            return NetworkVector.ApplyFunctionComponentWise(_inputVector, _outputVector, (x, y) => _neuralFunctionDerivative(x, y));            
+
+            return NetworkVector.ApplyFunctionComponentWise(_inputVector, _outputVector, (x, y) => _neuralFunctionDerivative(x, y));
+
+            //NetworkVector derivative = NetworkVector.ApplyFunctionComponentWise(_inputVector, _outputVector, (x, y) => _neuralFunctionDerivative(x, y));
+            //NetworkVector result = NetworkVector.ApplyFunctionComponentWise(derivative, outputgradient, (x, y) => x * y);
+            //return result;
         }
 
         public NetworkVector InputGradient(NetworkVector outputgradient, NetworkVector input, NetworkVector output)
@@ -89,7 +94,11 @@ namespace NeuralNet
             if (_neuralFunctionDerivative == null)
                 return outputgradient.Copy();
 
-            return NetworkVector.ApplyFunctionComponentWise(input, output, (x, y) => _neuralFunctionDerivative(x, y));
+            return NetworkVector.ApplyFunctionComponentWise(_inputVector, _outputVector, (x, y) => _neuralFunctionDerivative(x, y));
+
+            //NetworkVector derivative = NetworkVector.ApplyFunctionComponentWise(_inputVector, _outputVector, (x, y) => _neuralFunctionDerivative(x, y));
+            //NetworkVector result = NetworkVector.ApplyFunctionComponentWise(derivative, outputgradient, (x, y) => x * y);
+            //return result;
         }
 
         public override VectorBatch InputGradient(VectorBatch outputgradient)
@@ -104,6 +113,15 @@ namespace NeuralNet
                 _inputBatch.AsMatrix().Map2((x, y) => _neuralFunctionDerivative(x, y), _outputBatch.AsMatrix())
                 );
 
+            //VectorBatch derivative = new VectorBatch(
+            //    _inputBatch.AsMatrix().Map2((x, y) => _neuralFunctionDerivative(x, y), _outputBatch.AsMatrix())
+            //    );
+
+            //VectorBatch result = new VectorBatch(
+            //    derivative.AsMatrix().Map2((x, y) => x * y, outputgradient.AsMatrix() )
+            //    );
+
+            //return result;
         }
         #endregion
         

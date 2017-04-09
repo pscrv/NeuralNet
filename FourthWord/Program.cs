@@ -12,7 +12,7 @@ namespace FourthWord
         {
             FourthWordNetwork network = new FourthWordNetwork();
             DataReader reader = new DataReader();
-            Trainer trainer = new Trainer(network, new SoftMaxWithCrossEntropy(), new GradientDescent(0.00001, 100));
+            Trainer trainer = new Trainer(network, new SoftMaxWithCrossEntropy(), new GradientDescent(0.00000001, 100));
 
             Stopwatch sw = new Stopwatch();
             Console.WriteLine("Starting training, one epoch, in batches of size 100.");

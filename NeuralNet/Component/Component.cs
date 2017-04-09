@@ -17,6 +17,9 @@ namespace NeuralNet2
         #region constructors
         public Component(int numberOfInputs, int numberOfOutputs)
         {
+            if (numberOfInputs < 1 || numberOfOutputs < 1)
+                throw new ArgumentNullException("Any component must have at least one input and at least one output.");
+
             _numberOfInputs = numberOfInputs;
             _numberOfOutputs = numberOfOutputs;
         }
@@ -36,12 +39,12 @@ namespace NeuralNet2
 
         public DataVector BackPropagate(DataVector outputGradient)
         {
-            return new DataVector(_backPropate(outputGradient));
+            return new DataVector(_backPropagate(outputGradient));
         }
 
         public VectorBatch BackPropagate(VectorBatch outputGradient)
         {
-            return _backPropate(outputGradient);
+            return _backPropagate(outputGradient);
         }
         #endregion
 
@@ -54,7 +57,7 @@ namespace NeuralNet2
 
         #region abstract methods
         protected abstract VectorBatch _run(VectorBatch input);
-        protected abstract VectorBatch _backPropate(VectorBatch outputGradient);
+        protected abstract VectorBatch _backPropagate(VectorBatch outputGradient);
         #endregion
 
     }

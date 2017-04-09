@@ -4,12 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using NeuralNet2;
+
 namespace NeuralNet
 {
     public abstract class AdaptationStrategy
     {
         public abstract WeightsMatrix WeightsUpdate(WeightsMatrix gradient);
         public abstract NetworkVector BiasesUpdate(NetworkVector gradient);
+
+        public abstract NeuralNet2.WeightsMatrix WeightsUpdate(NeuralNet2.WeightsMatrix gradient);
+        public abstract NeuralNet2.BiasesVector BiasesUpdate(NeuralNet2.BiasesVector gradient);
     }
 
 
@@ -40,6 +45,21 @@ namespace NeuralNet
             result.Scale(-_stepSize / _batchSize);
             return result;
         }
+
+        public override BiasesVector BiasesUpdate(NeuralNet2.BiasesVector gradient)
+        {
+            Matrix delta = gradient.Scale(-_stepSize / _batchSize);
+            
+            return new BiasesVector( delta );
+        }
+
+        public override NeuralNet2.WeightsMatrix WeightsUpdate(NeuralNet2.WeightsMatrix gradient)
+        {
+            Matrix delta = gradient.Scale(-_stepSize / _batchSize);
+
+            return new NeuralNet2.WeightsMatrix( delta );
+        }
+
         #endregion
     }
 }

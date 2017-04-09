@@ -56,9 +56,14 @@
     <Compile Include="Adaptation\CostFunctions.cs" />
     <Compile Include="Algebra\BiasesVector.cs" />
     <Compile Include="Algebra\Matrix.cs" />
-    <Compile Include="Algebra\Vector.cs" />
+    <Compile Include="Algebra\DataVector.cs" />
     <Compile Include="Algebra\VectorBatch.cs" />
     <Compile Include="Algebra\WeightsMatrix.cs" />
+    <Compile Include="Component\Elements\Delegates.cs" />
+    <Compile Include="Component\Elements\NeuralFunction.cs" />
+    <Compile Include="Component\Elements\SoftMaxUnit.cs" />
+    <Compile Include="Component\Elements\WeightedCombiner.cs" />
+    <Compile Include="Component\Layer.cs" />
     <Compile Include="Component\TrainableComponent.cs" />
     <Compile Include="NetAlgebra\Interfaces.cs" />
     <Compile Include="Component\Component.cs" />

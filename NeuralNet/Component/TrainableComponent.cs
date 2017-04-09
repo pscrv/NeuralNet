@@ -9,10 +9,14 @@ namespace NeuralNet2
     public abstract class TrainableComponent : Component
     {
         #region attributes
+        protected VectorBatch _input;
         protected WeightsMatrix _weights;
         protected BiasesVector _biases;
+        #endregion
 
-        private VectorBatch _input;
+
+        #region public properties
+        public NeuralNet.AdaptationStrategy Strategy { protected get;  set; }
         #endregion
 
 
@@ -25,6 +29,8 @@ namespace NeuralNet2
 
             _weights = weights;
             _biases = biases;
+
+            Strategy = new NeuralNet.GradientDescent();  // default  - keep this here?
         }
         #endregion
 
@@ -36,7 +42,7 @@ namespace NeuralNet2
             return _trainingRun(_input);
         }
 
-        protected override VectorBatch _backPropate(VectorBatch outputGradient)
+        protected override VectorBatch _backPropagate(VectorBatch outputGradient)
         {
             VectorBatch inputGradient = _getInputGradient(outputGradient);
             _updateWeights(outputGradient);
